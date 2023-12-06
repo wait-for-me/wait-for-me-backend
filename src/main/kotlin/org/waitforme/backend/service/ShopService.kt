@@ -17,7 +17,7 @@ class ShopService(
     private val shopRepository: ShopRepository,
     private val shopImageRepository: ShopImageRepository,
 ) {
-    suspend fun getShopList(pageRequest: PageRequest): List<ShopListResponse> {
+    fun getShopList(pageRequest: PageRequest): List<ShopListResponse> {
         val now = LocalDate.now()
         return shopRepository.findShopList(
             startedAt = now,
@@ -26,7 +26,7 @@ class ShopService(
         ).map { it.toResponse() }
     }
 
-    suspend fun getShopDetail(id: Int): ShopDetailResponse {
+    fun getShopDetail(id: Int): ShopDetailResponse {
         return shopRepository.findByIdAndIsShow(id)?.let { shop ->
             val images = shopImageRepository.findByShopIdAndIsShowOrderByOrderNo(shop.id)
                 .map { it.toResponse() }

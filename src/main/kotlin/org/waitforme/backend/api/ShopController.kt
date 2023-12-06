@@ -18,7 +18,7 @@ class ShopController(
     private val shopService: ShopService
 ) {
     @GetMapping("")
-    suspend fun getShopList(
+    fun getShopList(
         @Parameter(name = "page", description = "0페이지부터 시작", `in` = ParameterIn.QUERY)
         page: Int? = 0,
         @Parameter(name = "size", description = "1페이지 당 크기", `in` = ParameterIn.QUERY)
@@ -27,7 +27,7 @@ class ShopController(
         shopService.getShopList(PageRequest.of(page ?: 0, size ?: 10))
 
     @GetMapping("/{id}")
-    suspend fun getShopDetail(
+    fun getShopDetail(
         @Parameter(name = "id", description = "팝업 ID", `in` = ParameterIn.PATH)
         @PathVariable
         id: Int
