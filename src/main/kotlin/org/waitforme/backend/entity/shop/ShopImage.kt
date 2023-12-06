@@ -2,9 +2,6 @@ package org.waitforme.backend.entity.shop
 
 import org.waitforme.backend.common.BaseEntity
 import org.waitforme.backend.enums.ImageType
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
 import javax.persistence.*
 
 @Table(name = "shop_image")
