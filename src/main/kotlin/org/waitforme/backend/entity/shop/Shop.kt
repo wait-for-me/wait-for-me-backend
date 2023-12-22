@@ -12,7 +12,7 @@ data class Shop(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
-    val userId: Int,
+    var userId: Int = 0,
     var registrationNumber: String,
     var category: String,
     var name: String,
@@ -25,5 +25,5 @@ data class Shop(
     var snsInfo: String = "{}",
     var isDeleted: Boolean = false,
     var isShow: Boolean = true,
-    var deletedAt: LocalDateTime
+    var deletedAt: LocalDateTime? = null
 ) : BaseEntity()
