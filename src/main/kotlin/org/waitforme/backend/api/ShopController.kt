@@ -1,13 +1,15 @@
 package org.waitforme.backend.api
 
+import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.tags.Tag
+import jdk.jfr.ContentType
 import org.springframework.data.domain.PageRequest
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.MediaType
+import org.springframework.web.bind.annotation.*
+import org.waitforme.backend.model.request.CreateShopRequest
+import org.waitforme.backend.model.response.shop.FrontShopDetailResponse
 import org.waitforme.backend.model.response.shop.ShopDetailResponse
 import org.waitforme.backend.model.response.shop.ShopListResponse
 import org.waitforme.backend.service.ShopService
@@ -32,6 +34,15 @@ class ShopController(
         @Parameter(name = "id", description = "팝업 ID", `in` = ParameterIn.PATH)
         @PathVariable
         id: Int
-    ): ShopDetailResponse =
+    ): FrontShopDetailResponse =
         shopService.getShopDetail(id)
+
+    @PostMapping("", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    @Operation(description = "BACKOFFICE - 팝업스토어 등록")
+    fun createShop(
+        // TODO: 관리자 체크 로직 추가
+        @ModelAttribute
+        shopRequest: CreateShopRequest,
+    ): ShopDetailResponse =
+        shopService.createShop(shopRequest)
 }
