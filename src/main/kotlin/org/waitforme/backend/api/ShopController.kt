@@ -45,4 +45,13 @@ class ShopController(
         shopRequest: CreateShopRequest,
     ): ShopDetailResponse =
         shopService.createShop(shopRequest)
+
+    @PutMapping("/show/{id}")
+    fun changeExposure(
+        @Parameter(name = "id", description = "팝업 ID", `in` = ParameterIn.PATH)
+        @PathVariable
+        id: Int,
+        @Parameter(name = "isShow", description = "노출 상태", `in` = ParameterIn.QUERY)
+        isShow: Boolean
+    ): Boolean = shopService.changeExposure(id, isShow)
 }

@@ -1,6 +1,7 @@
 package org.waitforme.backend.service
 
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.waitforme.backend.entity.shop.ShopImage
@@ -78,5 +79,13 @@ class ShopService(
         val shopImageInfo = shopImageRepository.saveAll(imageList)
 
         return shop.toDetailResponse(imageInfo = shopImageInfo as List<ShopImage>)
+    }
+
+    fun changeExposure(id: Int, isShow: Boolean): Boolean {
+        val shop = shopRepository.findByIdOrNull(id)
+            ?: throw NotFoundException("팝업스토어를 찾을 수 없습니다.")
+
+        shop.updateIsShow(isShow)
+        return shopRepository.save(shop) != null
     }
 }

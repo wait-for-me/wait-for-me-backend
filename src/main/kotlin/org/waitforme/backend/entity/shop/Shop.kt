@@ -26,4 +26,8 @@ data class Shop(
     var isDeleted: Boolean = false,
     var isShow: Boolean = true,
     var deletedAt: LocalDateTime? = null
-) : BaseEntity()
+) : BaseEntity() {
+    fun updateIsShow(isShow: Boolean) {
+        this.isShow = isShow
+    }
+}
