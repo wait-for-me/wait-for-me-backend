@@ -26,3 +26,13 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         format_sql: true      # 쿼리 로그 포맷 (정렬)
         show_sql: true        # 쿼리 로그 출력
+
+cloud:
+  aws:
+    s3:
+      bucket: <bucketName>
+      stack.auto: false
+      region.static: ap-northeast-2
+      credentials:
+        access-key: <accessKey>
+        secret-key: <secretKey>

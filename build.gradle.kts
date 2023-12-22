@@ -27,6 +27,9 @@ dependencies {
 	runtimeOnly("com.h2database:h2")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	implementation("org.springdoc:springdoc-openapi-ui:1.6.11")
+
+	implementation ("com.google.code.gson:gson:2.8.7")
+	implementation ("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
 }
 
 tasks.withType<KotlinCompile> {
