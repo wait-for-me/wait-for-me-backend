@@ -7,10 +7,10 @@ import org.springframework.transaction.annotation.Transactional
 import org.waitforme.backend.entity.shop.ShopImage
 import org.waitforme.backend.enums.ImageType
 import org.waitforme.backend.model.request.CreateShopRequest
+import org.waitforme.backend.model.request.UpdateShopRequest
 import org.waitforme.backend.model.response.shop.*
 import org.waitforme.backend.repository.shop.ShopImageRepository
 import org.waitforme.backend.repository.shop.ShopRepository
-import org.waitforme.backend.util.AwsUtil
 import org.waitforme.backend.util.ImageUtil
 import org.waitforme.backend.util.StringUtil
 import org.webjars.NotFoundException
@@ -43,8 +43,7 @@ class ShopService(
 
     @Transactional
     fun createShop(createShopRequest: CreateShopRequest): ShopDetailResponse {
-        if (createShopRequest.startedAt < LocalDate.now() ||
-                createShopRequest.startedAt >= createShopRequest.endedAt) {
+        if (checkPeriod(createShopRequest.startedAt, createShopRequest.endedAt)) {
             throw InvalidParameterException(
                 "팝업스토어의 기간 설정이 잘못되었습니다. startedAt: ${createShopRequest.startedAt}, endedAt: ${createShopRequest.endedAt}"
             )
@@ -59,12 +58,14 @@ class ShopService(
         val shop = shopRepository.save(createShopRequest.toEntity())
         val imageList = mutableListOf<ShopImage>()
 
+        var orderNo = 1
         createShopRequest.subImages?.map {
             imageList.add(
                 ShopImage(
                     shopId = shop.id,
                     imageType = ImageType.DETAIL,
-                    imagePath = imageUtil.uploadFile(it)
+                    imagePath = imageUtil.uploadFile(it),
+                    orderNo = orderNo++
                 )
             )
         } ?: throw InvalidParameterException("한장 이상의 상세 이미지를 등록해주세요.")
@@ -81,6 +82,63 @@ class ShopService(
         return shop.toDetailResponse(imageInfo = shopImageInfo as List<ShopImage>)
     }
 
+    @Transactional
+    fun updateShop(id: Int, updateShopRequest: UpdateShopRequest): ShopDetailResponse {
+        var shop = shopRepository.findByIdAndIsShow(id) ?: throw NotFoundException(
+            "팝업 정보를 찾을 수 없습니다."
+        )
+
+        shop.update(updateShopRequest)
+
+        if (checkPeriod(shop.startedAt, shop.endedAt)) {
+            throw InvalidParameterException(
+                "팝업스토어의 기간 설정이 잘못되었습니다. startedAt: ${shop.startedAt}, endedAt: ${shop.endedAt}"
+            )
+        }
+
+        // TODO: 등록된 사업자 유저인지 체크하는 로직 추가 필요
+
+        if(!StringUtil.validateRegistrationNumber(shop.registrationNumber)) {
+            throw InvalidParameterException("비정상적인 사업자 번호입니다.")
+        }
+
+        shopRepository.save(shop)
+        val imageList = mutableListOf<ShopImage>()
+
+        updateShopRequest.subImages?.let { images ->
+            var orderNo = 1
+
+            shopImageRepository.updateByShopIdAndTypeAndIsShow(shop.id, ImageType.DETAIL, false)
+            images.map {
+                imageList.add(
+                    ShopImage(
+                        shopId = shop.id,
+                        imageType = ImageType.DETAIL,
+                        imagePath = imageUtil.uploadFile(it),
+                        orderNo = orderNo++
+                    )
+                )
+            }
+        }
+
+        updateShopRequest.mainImage?.let {
+            shopImageRepository.updateByShopIdAndTypeAndIsShow(shop.id, ImageType.MAIN, false)
+            imageList.add(
+                ShopImage(
+                    shopId = shop.id,
+                    imageType = ImageType.MAIN,
+                    imagePath = imageUtil.uploadFile(it)
+                )
+            )
+        }
+
+        val shopImageInfo = imageList.takeIf { it.isNotEmpty() }?.let {
+            shopImageRepository.saveAll(it)
+        } ?: shopImageRepository.findByShopIdAndIsShowOrderByOrderNo(shop.id)
+
+        return shop.toDetailResponse(imageInfo = shopImageInfo as List<ShopImage>)
+    }
+
     fun changeExposure(id: Int, isShow: Boolean): Boolean {
         val shop = shopRepository.findByIdOrNull(id)
             ?: throw NotFoundException("팝업스토어를 찾을 수 없습니다.")
@@ -88,4 +146,7 @@ class ShopService(
         shop.updateIsShow(isShow)
         return shopRepository.save(shop) != null
     }
+
+    private fun checkPeriod(startedAt: LocalDate, endedAt: LocalDate): Boolean =
+        (startedAt < LocalDate.now() || startedAt >= endedAt)
 }

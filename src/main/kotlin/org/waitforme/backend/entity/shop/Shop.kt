@@ -1,6 +1,7 @@
 package org.waitforme.backend.entity.shop
 
 import org.waitforme.backend.common.BaseEntity
+import org.waitforme.backend.model.request.UpdateShopRequest
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -29,5 +30,17 @@ data class Shop(
 ) : BaseEntity() {
     fun updateIsShow(isShow: Boolean) {
         this.isShow = isShow
+    }
+
+    fun update(updateShopRequest: UpdateShopRequest, ) {
+        updateShopRequest.registrationNumber?.let { this.registrationNumber = it }
+        updateShopRequest.category?.let { this.category = it }
+        updateShopRequest.title?.let { this.name = it }
+        updateShopRequest.description?.let { this.description = it }
+        updateShopRequest.startedAt?.let { this.startedAt = it }
+        updateShopRequest.endedAt?.let { this.endedAt = it }
+        updateShopRequest.openedAt?.let { this.openedAt = it }
+        updateShopRequest.closedAt?.let { this.closedAt = it }
+        updateShopRequest.address?.let { this.address = it }
     }
 }

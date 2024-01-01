@@ -1,5 +1,6 @@
 package org.waitforme.backend.api
 
+import com.amazonaws.services.ec2.model.DefaultRouteTableAssociationValue
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -9,6 +10,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import org.waitforme.backend.model.request.CreateShopRequest
+import org.waitforme.backend.model.request.UpdateShopRequest
 import org.waitforme.backend.model.response.shop.FrontShopDetailResponse
 import org.waitforme.backend.model.response.shop.ShopDetailResponse
 import org.waitforme.backend.model.response.shop.ShopListResponse
@@ -37,6 +39,7 @@ class ShopController(
     ): FrontShopDetailResponse =
         shopService.getShopDetail(id)
 
+    // BACKOFFICE
     @PostMapping("", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @Operation(description = "BACKOFFICE - 팝업스토어 등록")
     fun createShop(
@@ -45,6 +48,17 @@ class ShopController(
         shopRequest: CreateShopRequest,
     ): ShopDetailResponse =
         shopService.createShop(shopRequest)
+
+    @PutMapping("/{id}", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    @Operation(description = "BACKOFFICE - 팝업스토어 수정")
+    fun updateShop(
+        @Parameter(name = "id", description = "팝업 스토어 id", `in` = ParameterIn.PATH)
+        @PathVariable id: Int,
+        @ModelAttribute
+        shopRequest: UpdateShopRequest,
+    ): ShopDetailResponse =
+        shopService.updateShop(id, shopRequest)
+
 
     @PutMapping("/show/{id}")
     fun changeExposure(
