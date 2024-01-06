@@ -5,17 +5,20 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.User
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Component
 import org.springframework.util.StringUtils
 import org.waitforme.backend.common.Logger
 import org.waitforme.backend.enums.UserRole
+import org.waitforme.backend.model.LoginAdmin
 import org.waitforme.backend.model.dto.JwtDto
 import org.waitforme.backend.model.dto.TokenDto
+import org.waitforme.backend.repository.admin.AdminRepository
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -26,7 +29,9 @@ import javax.servlet.http.HttpServletRequest
 
 @Component
 @ConfigurationProperties(prefix = "jwt")
-class JwtTokenProvider {
+class JwtTokenProvider(
+    private val adminRepository: AdminRepository,
+) {
 
     lateinit var tokenSecretKey: String
     lateinit var accessTokenValidTime: String
@@ -46,8 +51,8 @@ class JwtTokenProvider {
         key = Keys.hmacShaKeyFor(keyBytes)
     }
 
-    fun createToken(id: Int, name: String, expireDate: Date?, role: List<UserRole>): String {
-        val grantedAuthorities = role.map { SimpleGrantedAuthority(it.name).authority }
+    fun createToken(id: Int, name: String, expireDate: Date?, role: UserRole): String {
+        val grantedAuthorities = SimpleGrantedAuthority(role.name).authority
 
         return Jwts.builder()
             .setId(id.toString())
@@ -58,7 +63,7 @@ class JwtTokenProvider {
             .compact()
     }
 
-    fun createJwt(id: Int, email: String, name: String, role: List<UserRole>): JwtDto {
+    fun createJwt(id: Int, email: String, name: String, role: UserRole): JwtDto {
         val now = System.currentTimeMillis()
         val nowLocalDateTime = toLocalDateTime(Instant.ofEpochMilli(now))
 
@@ -94,16 +99,38 @@ class JwtTokenProvider {
             .body
 
         // ROLE
-        val roles = claims[AUTHORITIES_KEY] as List<String>
-        val authorities = roles.map { SimpleGrantedAuthority(it) }
+        val id = claims.id.toInt()
+        val role = claims[AUTHORITIES_KEY].toString()
+        val authorities = SimpleGrantedAuthority(role)
 
-        val userDetails = User(claims.subject, "", authorities)
-        return UsernamePasswordAuthenticationToken(userDetails, token, authorities)
+        val userDetails =
+            when (role) {
+                UserRole.ADMIN.name -> {
+                    adminRepository.findByIdOrNull(id)?.let { admin ->
+                        LoginAdmin(admin)
+                    } ?: throw UsernameNotFoundException(id.toString())
+                }
 
-//        val claims = parseClaims(accessToken)
-//        val id = claims[Claims.SUBJECT] as String
-//        val userDetails = customUserDetailsService.loadUserByUsername(id)
-//        return UsernamePasswordAuthenticationToken(userDetails, "", listOf(SimpleGrantedAuthority("ROLE_USER")))
+                UserRole.USER.name -> {
+                    // TODO
+                    adminRepository.findByIdOrNull(id)?.let { admin ->
+                        LoginAdmin(admin)
+                    } ?: throw UsernameNotFoundException(id.toString())
+                }
+
+                UserRole.OWNER.name -> {
+                    // TODO
+                    adminRepository.findByIdOrNull(id)?.let { admin ->
+                        LoginAdmin(admin)
+                    } ?: throw UsernameNotFoundException(id.toString())
+                }
+
+                else -> {
+                    throw UsernameNotFoundException(id.toString())
+                }
+            }
+
+        return UsernamePasswordAuthenticationToken(userDetails, token, listOf(authorities))
     }
 
     // Request Header에서 토큰 정보를 꺼내오기 위한 메소드

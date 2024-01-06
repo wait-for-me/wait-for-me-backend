@@ -49,6 +49,6 @@ class AdminService(
             id = admin.id,
             email = admin.email,
             name = admin.name ?: "",
-            role = listOf(UserRole.ADMIN),
+            role = UserRole.ADMIN,
         )
 }

@@ -25,7 +25,7 @@ class JwtAuthenticationFilter(private val jwtTokenProvider: JwtTokenProvider) : 
 
             // SecurityContext 에 Authentication 객체 (인증 정보)를 저장.
             SecurityContextHolder.getContext().authentication = authentication
-            logger.info("[${request.method}] $requestURI - Security Context에 '${authentication.name}' 인증 정보를 저장했습니다")
+            logger.info("[${request.method}] $requestURI - Security Context에 'ROLE = ${authentication.authorities}', 'ID = ${authentication.name}' 인증 정보를 저장했습니다")
         } else {
             logger.info("[${request.method}] $requestURI - 유효한 토큰 정보가 없습니다.")
         }
