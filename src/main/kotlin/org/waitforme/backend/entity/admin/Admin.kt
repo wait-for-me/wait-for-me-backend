@@ -16,8 +16,8 @@ data class Admin(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
     val email: String,
-    val name: String,
-    val password: String,
+    val name: String? = null,
+    private val password: String,
     val authority: AdminAuthority,
     val isDeleted: Boolean? = false,
     var deletedAt: LocalDateTime? = null,
@@ -31,7 +31,7 @@ data class Admin(
         return password
     }
 
-    override fun getUsername(): String {
+    override fun getUsername(): String? {
         return name
     }
 
