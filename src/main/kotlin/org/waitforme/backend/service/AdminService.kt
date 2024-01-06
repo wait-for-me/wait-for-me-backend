@@ -4,6 +4,8 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.waitforme.backend.config.security.JwtTokenProvider
 import org.waitforme.backend.entity.admin.Admin
+import org.waitforme.backend.enums.AdminAuthority
+import org.waitforme.backend.enums.UserRole
 import org.waitforme.backend.model.request.admin.AdminAuthRequest
 import org.waitforme.backend.model.response.admin.AdminAuthResponse
 import org.waitforme.backend.model.response.admin.toAdminAuthResponse
@@ -26,24 +28,27 @@ class AdminService(
                     email = request.email,
                     name = request.name,
                     password = passwordEncoder.encode(request.password),
-                    authority = request.authority, // TODO : 권한은 어떻게 줄 것인지?
+                    authority = AdminAuthority.LEVEL_0, // 기본 권한 레벨은 0, 추후 관리자에 의해 레벨 조정
                 ),
             )
         }
-        return createToken(admin).toAdminAuthResponse(authority = admin.authority)
+        return createAdminToken(admin).toAdminAuthResponse(authority = admin.authority)
     }
 
     fun login(request: AdminAuthRequest): AdminAuthResponse {
         return adminRepository.findAdminByEmailAndIsDeleted(email = request.email, isDeleted = false)?.let { admin ->
-            when (passwordEncoder.matches(admin.password, request.password)) {
-                true -> createToken(admin).toAdminAuthResponse(authority = admin.authority)
+            when (passwordEncoder.matches(request.password, admin.password)) {
+                true -> createAdminToken(admin).toAdminAuthResponse(authority = admin.authority)
                 false -> throw InvalidParameterException("잘못된 비밀번호입니다.")
             }
         } ?: throw InvalidParameterException("유효하지 않은 관리자입니다.")
     }
 
-    // TODO : refreshToken?
-
-    private fun createToken(admin: Admin) =
-        jwtTokenProvider.createJwt(id = admin.id, email = admin.email, name = admin.name)
+    private fun createAdminToken(admin: Admin) =
+        jwtTokenProvider.createJwt(
+            id = admin.id,
+            email = admin.email,
+            name = admin.name ?: "",
+            role = listOf(UserRole.ADMIN),
+        )
 }
