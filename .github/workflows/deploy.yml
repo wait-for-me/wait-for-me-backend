@@ -1,11 +1,17 @@
 
-name: CI-CD
+name: CI/CD
 
 on:
-  push:
-    branches: [ "master"]
-  pull_request:
-    branches: [ "master"]
+  pull_request_target:
+    types:
+      - closed
+    branches:
+      - 'master'
+
+env:
+  S3_BUCKET_NAME: ${{secrets.DEPLOY_S3_BUCKET_NAME}}
+  AWS_ACCESS_KEY: ${{secrets.AWS_ACCESS_KEY}}
+  AWS_SECRET_KEY: ${{secrets.AWS_SECRET_KEY}}
 
 jobs:
   build:
@@ -17,7 +23,29 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: '11'
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew clean build
+
+      - name : Make directory
+        run: mkdir -p deploy
+
+      - name : Copy Jar
+        run: cp ./build/libs/*.jar ./deploy
+
+      - name : Make zip file
+        run: zip -r ./waitforme.zip ./deploy
+        shell: bash
+
+      - name : Configure AWS credentials
+        uses: aws-actions/configure/aws-credentials@v1
+        with:
+          aws-access-key-id: $AWS_ACCESS_KEY
+          aws-secret-access-key: $AWS_SERCRET_KEY
+          aws-region : ap-northeast-2
+
+      - name : Upload to S3
+        run : aws s3 cp --region ap-northeast-2 ./waitforme.zip s3://$S#_BUCKET_NAME
