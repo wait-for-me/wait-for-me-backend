@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 data class JwtDto(
     val accessToken: TokenDto,
     val refreshToken: TokenDto,
-    val email: String,
+    val account: String,
     val name: String,
 )
 

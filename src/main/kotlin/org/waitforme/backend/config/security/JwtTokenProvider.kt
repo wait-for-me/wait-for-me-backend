@@ -63,7 +63,7 @@ class JwtTokenProvider(
             .compact()
     }
 
-    fun createJwt(id: Int, email: String, name: String, role: UserRole): JwtDto {
+    fun createJwt(id: Int, account: String, name: String, role: UserRole): JwtDto {
         val now = System.currentTimeMillis()
         val nowLocalDateTime = toLocalDateTime(Instant.ofEpochMilli(now))
 
@@ -85,7 +85,7 @@ class JwtTokenProvider(
                 expiredAt = toLocalDateTime(refreshTokenExpireTime.toInstant()),
 
             ),
-            email = email,
+            account = account,
             name = name,
         )
     }
