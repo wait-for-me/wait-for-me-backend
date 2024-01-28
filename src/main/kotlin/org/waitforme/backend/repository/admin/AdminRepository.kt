@@ -6,5 +6,5 @@ import org.waitforme.backend.entity.admin.Admin
 
 @Repository
 interface AdminRepository : CrudRepository<Admin, Int> {
-    fun findAdminByEmailAndIsDeleted(email: String, isDeleted: Boolean): Admin?
+    fun findAdminByEmail(email: String): Admin?
 }
