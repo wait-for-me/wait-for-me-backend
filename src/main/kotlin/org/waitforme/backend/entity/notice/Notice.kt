@@ -10,7 +10,6 @@ data class Notice(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
-    val adminId: Int,
     var title: String,
     var contents: String,
     var isDeleted: Boolean = false,

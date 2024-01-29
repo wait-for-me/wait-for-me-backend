@@ -26,3 +26,8 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         format_sql: true      # 쿼리 로그 포맷 (정렬)
         show_sql: true        # 쿼리 로그 출력
+
+jwt:
+  token-secret-key: ThisIsTempSecretKeyWaitForMeThisIsTempSecretKeyWaitForMeThisIsTempSecretKeyWaitForMe
+  access-token-valid-time: 1800000   # 30분
+  refresh-token-valid-time: 3600000
