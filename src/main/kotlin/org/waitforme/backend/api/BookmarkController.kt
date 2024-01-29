@@ -5,9 +5,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.waitforme.backend.model.response.bookmark.BookmarkResponse
 import org.waitforme.backend.service.BookmarkService
 
@@ -28,5 +26,14 @@ class BookmarkController(
         size: Int? = 10,
     ): Page<BookmarkResponse> =
         bookmarkService.findBookmarkList(userId, PageRequest.of(page ?: 0, size ?: 10))
+
+    @PostMapping("/{shopId}")
+    fun updateBookmark(
+        @Parameter(name = "userId", description = "유저 ID", `in` = ParameterIn.QUERY)
+        userId: Int,
+        @Parameter(name = "shopId", description = "유저 ID", `in` = ParameterIn.PATH) @PathVariable
+        shopId: Int,
+    ): Boolean =
+        bookmarkService.updateBookmark(userId, shopId)
 
 }

@@ -8,4 +8,6 @@ import org.waitforme.backend.model.dto.bookmark.BookmarkResultDto
 
 @Repository
 interface BookmarkRepository : CrudRepository<Bookmark, Int>, BookmarkCustomRepository {
+
+    fun findByUserIdAndShopId(userId: Int, shopId: Int): Bookmark?
 }
