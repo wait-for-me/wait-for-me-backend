@@ -29,6 +29,7 @@ class SecurityConfig(
             "/swagger-ui/**",
             "/v1/admin/sign-up",
             "/v1/admin/login",
+            "/v1/auth/**"
         )
 
     @Bean

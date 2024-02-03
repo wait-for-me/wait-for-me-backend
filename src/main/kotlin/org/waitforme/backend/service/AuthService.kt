@@ -55,11 +55,11 @@ class AuthService(
             val userRequestedAt = userAuth.requestedAt
 
             // 이미 인증이 완료되었는지 확인 - 15분 내로 인증을 받은 회원이어야 함
-            if (userAuthAt != null && Duration.between(LocalDateTime.now(), userAuthAt).toMinutes() < 15) {
+            if (userAuthAt != null && Duration.between(userAuthAt, LocalDateTime.now()).toMinutes() < 15) {
                 throw IllegalArgumentException("이미 인증이 완료된 회원입니다. 회원가입을 진행해주세요.")
             }
 
-            if (Duration.between(LocalDateTime.now(), userRequestedAt).seconds <= 30) {
+            if (Duration.between(userRequestedAt, LocalDateTime.now()).seconds <= 30) {
                 throw IllegalArgumentException("인증 번호 재요청은 요청을 보낸 후 30초 후에 가능합니다.")
             }
 
@@ -78,10 +78,11 @@ class AuthService(
         return true
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     fun verifyAuthLocal(request: LocalAuthRequest): Boolean {
         return userAuthRepository.findByPhoneNumber(phoneNumber = request.phoneNumber)?.let { userAuth ->
             userAuth.authenticatedAt?.let {
-                if (Duration.between(LocalDateTime.now(), userAuth.authenticatedAt).toMinutes() < 15) {
+                if (Duration.between(userAuth.authenticatedAt, LocalDateTime.now()).toMinutes() < 15) {
                     throw IllegalArgumentException("이미 인증이 완료된 회원입니다. 회원가입을 진행해주세요.")
                 } else {
                     throw IllegalArgumentException("인증 유효시간 15분을 초과했습니다. 다시 인증을 시도해주세요.")
@@ -102,11 +103,23 @@ class AuthService(
         } ?: throw IllegalArgumentException("인증 정보를 찾을 수 없습니다. 인증을 다시 요청해주세요.")
     }
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     fun signUpLocal(request: LocalSignUpRequest): AuthResponse {
+        userRepository.findByProviderAndPhoneNumber(
+            provider = Provider.LOCAL,
+            phoneNumber = request.phoneNumber,
+        )?.let {
+            if (it.isDeleted || it.deletedAt != null) {
+                throw IllegalArgumentException("탈퇴 처리된 계정은 재가입할 수 없습니다.")
+            }
+
+            throw IllegalArgumentException("이미 등록된 계정입니다. 로그인 해주세요.")
+        }
+
         return userAuthRepository.findByPhoneNumber(phoneNumber = request.phoneNumber)?.let {
             // 이미 인증이 완료되었는지 확인 - 15분 내로 인증을 받은 회원이어야 함
             it.authenticatedAt?.let { userAuthAt ->
-                if (Duration.between(LocalDateTime.now(), userAuthAt).toMinutes() < 15) {
+                if (Duration.between(userAuthAt, LocalDateTime.now()).toMinutes() < 15) {
                     // 인증 완료 시 회원가입 완료
                     val user = userRepository.save(request.toUserEntity(encoder, isOwner = false, isAuth = true))
                     val token = jwtTokenProvider.createJwt(
@@ -124,7 +137,6 @@ class AuthService(
         } ?: throw IllegalArgumentException("인증 정보를 찾을 수 없습니다. 인증을 다시 요청해주세요.")
     }
 
-    @Transactional
     fun signInLocal(request: LocalSignInRequest): AuthResponse {
         val user = userRepository.findByProviderAndPhoneNumber(
             provider = Provider.LOCAL,

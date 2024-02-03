@@ -11,8 +11,13 @@ import java.time.LocalDateTime
 import javax.persistence.*
 import javax.security.auth.message.AuthException
 
-@Table(name = "`user`")
 @Entity
+@Table(
+    name = "`user`",
+    indexes = [
+        Index(name = "idx_provider_phone_number", columnList = "provider, phoneNumber", unique = true), // index (unique = false (default))
+    ]
+)
 data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

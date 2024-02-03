@@ -22,8 +22,8 @@ class UserService(
     fun saveUserInfo(userId: Int, request: UserInfoRequest): UserInfoResponse {
         return userRepository.findByIdOrNull(userId)?.apply {
             name = request.name
-            birthedAt = request.birthedAt
-            gender = request.gender
+            request.birthedAt?.let { birthedAt = it }
+            request.gender?.let { gender = it }
     //                profileImage = request.profileImage // TODO : 프로필 이미지 s3 업로드
         }?.run {
             userRepository.save(this)

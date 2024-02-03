@@ -14,12 +14,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Component
 import org.springframework.util.StringUtils
 import org.waitforme.backend.common.Logger
+import org.waitforme.backend.entity.user.UserRefreshToken
 import org.waitforme.backend.enums.UserRole
 import org.waitforme.backend.model.LoginAdmin
 import org.waitforme.backend.model.dto.JwtDto
 import org.waitforme.backend.model.dto.TokenDto
 import org.waitforme.backend.model.toLoginUser
 import org.waitforme.backend.repository.admin.AdminRepository
+import org.waitforme.backend.repository.user.UserRefreshTokenRepository
 import org.waitforme.backend.repository.user.UserRepository
 import java.time.Instant
 import java.time.LocalDateTime
@@ -35,6 +37,7 @@ import javax.servlet.http.HttpServletRequest
 class JwtTokenProvider(
     private val adminRepository: AdminRepository,
     private val userRepository: UserRepository,
+    private val userRefreshTokenRepository: UserRefreshTokenRepository,
 ) {
 
     lateinit var tokenSecretKey: String
@@ -76,6 +79,16 @@ class JwtTokenProvider(
 
         val accessToken = createToken(id, name, accessTokenExpireTime, role)
         val refreshToken = createToken(id, name, refreshTokenExpireTime, role)
+
+        // refreshToken 있으면 업데이트하고, 없으면 save
+        userRefreshTokenRepository.findByIdOrNull(id)?.updateRefreshToken(refreshToken) ?: run {
+            userRefreshTokenRepository.save(
+                UserRefreshToken(
+                    userId = id,
+                    refreshToken = refreshToken,
+                ),
+            )
+        }
 
         return JwtDto(
             accessToken = TokenDto(

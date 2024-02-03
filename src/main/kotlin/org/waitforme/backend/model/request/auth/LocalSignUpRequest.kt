@@ -8,14 +8,13 @@ import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 
 data class LocalSignUpRequest(
-    @field:Pattern(regexp = "010-[0-9]{3,4}-[0-9]{4}")
+    @field:Pattern(regexp = "010[0-9]{3,4}[0-9]{4}")
     val phoneNumber: String,
     @NotBlank
     val name: String,
     @NotBlank
-    @Size(min = 7, max = 25)
+    @field:Size(min = 7, max = 25)
     val password: String,
-    val isOwner: Boolean,
 )
 
 fun LocalSignUpRequest.toUserEntity(encoder: PasswordEncoder, isOwner: Boolean, isAuth: Boolean) = User(
@@ -24,5 +23,5 @@ fun LocalSignUpRequest.toUserEntity(encoder: PasswordEncoder, isOwner: Boolean, 
     password = encoder.encode(password),
     name = name,
     isOwner = isOwner,
-    isAuth = isAuth
+    isAuth = isAuth,
 )
