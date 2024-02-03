@@ -1,5 +1,6 @@
 package org.waitforme.backend.service
 
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Isolation
@@ -8,6 +9,7 @@ import org.waitforme.backend.config.security.JwtTokenProvider
 import org.waitforme.backend.entity.user.UserAuth
 import org.waitforme.backend.enums.Provider
 import org.waitforme.backend.enums.UserRole
+import org.waitforme.backend.model.dto.JwtDto
 import org.waitforme.backend.model.request.auth.LocalAuthRequest
 import org.waitforme.backend.model.request.auth.LocalSignInRequest
 import org.waitforme.backend.model.request.auth.LocalSignUpRequest
@@ -15,6 +17,7 @@ import org.waitforme.backend.model.request.auth.toUserEntity
 import org.waitforme.backend.model.response.auth.AuthResponse
 import org.waitforme.backend.model.response.auth.toUserResponse
 import org.waitforme.backend.repository.user.UserAuthRepository
+import org.waitforme.backend.repository.user.UserRefreshTokenRepository
 import org.waitforme.backend.repository.user.UserRepository
 import java.security.InvalidParameterException
 import java.time.Duration
@@ -25,6 +28,7 @@ import javax.security.auth.message.AuthException
 class AuthService(
     private val userRepository: UserRepository,
     private val userAuthRepository: UserAuthRepository,
+    private val userRefreshTokenRepository: UserRefreshTokenRepository,
     private val jwtTokenProvider: JwtTokenProvider,
     private val encoder: PasswordEncoder,
 ) {
@@ -143,5 +147,31 @@ class AuthService(
         }
 
         return user.toUserResponse(token)
+    }
+
+    @Transactional
+    fun refresh(refreshToken: String): JwtDto {
+        jwtTokenProvider.validateRefreshToken(refreshToken)
+
+        // refreshToken이 저장되어있는지 확인
+        val userRefreshToken = userRefreshTokenRepository.findByRefreshToken(refreshToken) ?: throw AuthException(
+            "존재하지 않는 refreshToken입니다.",
+        )
+
+        // 유저 찾기
+        val user = userRepository.findByIdOrNull(id = userRefreshToken.userId) ?: throw AuthException("존재하지 않는 유저라서 token 갱신에 실패했습니다.")
+        user.checkAuthUser()
+        user.checkDeletedUser()
+
+        // token 새로 발급받기
+        val token = jwtTokenProvider.createJwt(
+                id = user.id,
+                account = user.phoneNumber,
+                name = user.name,
+                role = UserRole.USER,
+            )
+        userRefreshToken.updateRefreshToken(token.refreshToken.token) // 새로 발급받은 refreshToken을 저장
+
+        return token
     }
 }

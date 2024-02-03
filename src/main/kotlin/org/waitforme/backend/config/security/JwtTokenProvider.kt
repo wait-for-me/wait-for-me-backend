@@ -27,6 +27,7 @@ import java.time.ZoneId
 import java.util.*
 import javax.annotation.PostConstruct
 import javax.crypto.SecretKey
+import javax.security.auth.message.AuthException
 import javax.servlet.http.HttpServletRequest
 
 @Component
@@ -154,6 +155,14 @@ class JwtTokenProvider(
         }.onFailure {
             logger.warn("accessToken 만료 또는 잘못된 형식입니다.")
         }.getOrElse { false }
+    }
+
+    fun validateRefreshToken(token: String) {
+        runCatching {
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token)
+        }.onFailure {
+            throw AuthException("refreshToken 만료 또는 잘못된 형식으로 로그인이 필요합니다.")
+        }
     }
 
     private fun toLocalDateTime(instant: Instant) = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
