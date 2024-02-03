@@ -48,4 +48,7 @@ jobs:
           aws-region : ap-northeast-2
 
       - name : Upload to S3
-        run : aws s3 cp --region ap-northeast-2 ./waitforme.zip s3://$S#_BUCKET_NAME
+        run : aws s3 cp --region ap-northeast-2 ./waitforme.zip s3://$S3_BUCKET_NAME
+
+      - name: Code Deploy
+        run: aws deploy create-deployment --application-name waitforme --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name waitforme-group --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=waitforme.zip.zip
