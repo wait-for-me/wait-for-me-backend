@@ -42,7 +42,7 @@ class NoticeController(
     fun createNotice(
         @Parameter(hidden = true) @AuthenticationPrincipal loginAdmin: LoginAdmin,
         @RequestBody noticeRequest: NoticeRequest,
-    ): NoticeResponse =
+    ): Int =
         noticeService.saveNotice(request = noticeRequest, loginAdmin = loginAdmin)
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -51,7 +51,7 @@ class NoticeController(
         @Parameter(hidden = true) @AuthenticationPrincipal loginAdmin: LoginAdmin,
         @Parameter(name = "id", description = "공지 ID", `in` = ParameterIn.PATH) @PathVariable id: Int,
         @RequestBody noticeRequest: NoticeRequest,
-    ): NoticeResponse =
+    ): Int =
         noticeService.saveNotice(noticeId = id, request = noticeRequest, loginAdmin = loginAdmin)
 
     @PreAuthorize("hasAuthority('ADMIN')")
