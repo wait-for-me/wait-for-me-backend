@@ -13,7 +13,7 @@ data class AuthResponse(
     val refreshToken: TokenDto,
 )
 
-fun User.toUserResponse(token: JwtDto) = AuthResponse(
+fun User.toAuthResponse(token: JwtDto) = AuthResponse(
     accessToken = token.accessToken,
     refreshToken = token.refreshToken,
     phoneNumber = phoneNumber,

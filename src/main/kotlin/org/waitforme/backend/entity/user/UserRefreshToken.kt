@@ -9,7 +9,7 @@ import javax.persistence.*
 data class UserRefreshToken(
     @Id
     @GeneratedValue
-    val id: Long? = null,
+    val id: Int? = null,
     val userId: Int,
     @Column(columnDefinition = "TEXT")
     var refreshToken: String,

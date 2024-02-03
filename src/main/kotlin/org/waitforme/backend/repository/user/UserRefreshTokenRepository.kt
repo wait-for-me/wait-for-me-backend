@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository
 import org.waitforme.backend.entity.user.UserRefreshToken
 
 @Repository
-interface UserRefreshTokenRepository : CrudRepository<UserRefreshToken, Long> {
-    fun findByUserId(userId: Long): UserRefreshToken?
+interface UserRefreshTokenRepository : CrudRepository<UserRefreshToken, Int> {
     fun findByRefreshToken(refreshToken: String): UserRefreshToken?
 }

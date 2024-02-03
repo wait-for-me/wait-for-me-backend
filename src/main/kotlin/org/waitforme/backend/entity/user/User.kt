@@ -4,6 +4,7 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.waitforme.backend.common.BaseEntity
+import org.waitforme.backend.enums.GenderType
 import org.waitforme.backend.enums.Provider
 import org.waitforme.backend.enums.UserRole
 import java.time.LocalDateTime
@@ -20,8 +21,11 @@ data class User(
     val phoneNumber: String,
     val snsId: String? = null,
     val email: String? = null,
-    val name: String,
+    var name: String,
     private val password: String? = null,
+    var birthedAt: LocalDateTime? = null,
+    var gender: GenderType? = null,
+    val profileImage: String? = null,
     val isOwner: Boolean = false,
     val isAuth: Boolean = false, // 인증 여부, sns로 등록 시 자동 인증, local은 회원 가입 시 인증 절차 필요
     val isAdult: Boolean = false,

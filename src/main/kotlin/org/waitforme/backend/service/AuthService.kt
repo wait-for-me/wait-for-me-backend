@@ -15,7 +15,7 @@ import org.waitforme.backend.model.request.auth.LocalSignInRequest
 import org.waitforme.backend.model.request.auth.LocalSignUpRequest
 import org.waitforme.backend.model.request.auth.toUserEntity
 import org.waitforme.backend.model.response.auth.AuthResponse
-import org.waitforme.backend.model.response.auth.toUserResponse
+import org.waitforme.backend.model.response.auth.toAuthResponse
 import org.waitforme.backend.repository.user.UserAuthRepository
 import org.waitforme.backend.repository.user.UserRefreshTokenRepository
 import org.waitforme.backend.repository.user.UserRepository
@@ -116,7 +116,7 @@ class AuthService(
                         role = UserRole.USER,
                     )
 
-                    user.toUserResponse(token)
+                    user.toAuthResponse(token)
                 } else {
                     throw IllegalArgumentException("인증 유효시간 15분을 초과했습니다. 다시 인증을 시도해주세요.")
                 }
@@ -146,7 +146,7 @@ class AuthService(
             throw AuthException("비밀번호가 일치하지 않습니다.")
         }
 
-        return user.toUserResponse(token)
+        return user.toAuthResponse(token)
     }
 
     @Transactional
@@ -165,11 +165,11 @@ class AuthService(
 
         // token 새로 발급받기
         val token = jwtTokenProvider.createJwt(
-                id = user.id,
-                account = user.phoneNumber,
-                name = user.name,
-                role = UserRole.USER,
-            )
+            id = user.id,
+            account = user.phoneNumber,
+            name = user.name,
+            role = UserRole.USER,
+        )
         userRefreshToken.updateRefreshToken(token.refreshToken.token) // 새로 발급받은 refreshToken을 저장
 
         return token
