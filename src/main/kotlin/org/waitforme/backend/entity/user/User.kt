@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 import javax.persistence.*
 import javax.security.auth.message.AuthException
 
-@Table(name = "user")
+@Table(name = "`user`")
 @Entity
 data class User(
     @Id
@@ -23,7 +23,7 @@ data class User(
     val name: String,
     private val password: String? = null,
     val isOwner: Boolean = false,
-    val isAuth: Boolean? = false, // 인증 여부, sns로 등록 시 자동 인증, local은 회원 가입 시 인증 절차 필요
+    val isAuth: Boolean = false, // 인증 여부, sns로 등록 시 자동 인증, local은 회원 가입 시 인증 절차 필요
     val isAdult: Boolean = false,
     val isDeleted: Boolean = false,
     var deletedAt: LocalDateTime? = null,
@@ -61,8 +61,14 @@ data class User(
     }
 
     fun checkDeletedUser() {
-        if (isDeleted && deletedAt != null) {
-            throw AuthException("탈퇴 처리가 된 유저입니다.")
+        if (isDeleted || deletedAt != null) {
+            throw AuthException("탈퇴 처리된 계정입니다.")
+        }
+    }
+
+    fun checkAuthUser() {
+        if (!isAuth) {
+            throw AuthException("인증이 확인되지 않은 계정입니다.")
         }
     }
 }

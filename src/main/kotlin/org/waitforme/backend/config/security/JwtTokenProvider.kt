@@ -18,7 +18,9 @@ import org.waitforme.backend.enums.UserRole
 import org.waitforme.backend.model.LoginAdmin
 import org.waitforme.backend.model.dto.JwtDto
 import org.waitforme.backend.model.dto.TokenDto
+import org.waitforme.backend.model.toLoginUser
 import org.waitforme.backend.repository.admin.AdminRepository
+import org.waitforme.backend.repository.user.UserRepository
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -31,6 +33,7 @@ import javax.servlet.http.HttpServletRequest
 @ConfigurationProperties(prefix = "jwt")
 class JwtTokenProvider(
     private val adminRepository: AdminRepository,
+    private val userRepository: UserRepository,
 ) {
 
     lateinit var tokenSecretKey: String
@@ -112,16 +115,16 @@ class JwtTokenProvider(
                 }
 
                 UserRole.USER.name -> {
-                    // TODO
-                    adminRepository.findByIdOrNull(id)?.let { admin ->
-                        LoginAdmin(admin)
+                    userRepository.findByIdOrNull(id)?.let { user ->
+                        // TODO : 확인 필요 - isOwner 체크 필요?
+                        user.toLoginUser()
                     } ?: throw UsernameNotFoundException(id.toString())
                 }
 
                 UserRole.OWNER.name -> {
-                    // TODO
-                    adminRepository.findByIdOrNull(id)?.let { admin ->
-                        LoginAdmin(admin)
+                    userRepository.findByIdOrNull(id)?.let { user ->
+                        // TODO : 확인 필요 - isOwner 체크 필요?
+                        user.toLoginUser()
                     } ?: throw UsernameNotFoundException(id.toString())
                 }
 

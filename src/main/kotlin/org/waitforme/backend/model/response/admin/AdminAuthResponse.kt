@@ -15,7 +15,7 @@ data class AdminAuthResponse(
 fun JwtDto.toAdminAuthResponse(authority: AdminAuthority) = AdminAuthResponse(
     accessToken = accessToken,
     refreshToken = refreshToken,
-    email = email,
+    email = account,
     name = name,
     authority = authority
 )

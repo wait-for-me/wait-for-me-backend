@@ -1,6 +1,6 @@
 package org.waitforme.backend.model.request.auth
 
-data class LocalAuthRequest(
+data class LocalSignInRequest(
     val phoneNumber: String,
-    val authText: String? = null,
+    val password: String,
 )
