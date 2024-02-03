@@ -3,10 +3,17 @@ package org.waitforme.backend.model.request.auth
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.waitforme.backend.entity.user.User
 import org.waitforme.backend.enums.Provider
+import javax.validation.constraints.NotBlank
+import javax.validation.constraints.Pattern
+import javax.validation.constraints.Size
 
 data class LocalSignUpRequest(
+    @field:Pattern(regexp = "010-[0-9]{3,4}-[0-9]{4}")
     val phoneNumber: String,
-    val name: String, // nickname?
+    @NotBlank
+    val name: String,
+    @NotBlank
+    @Size(min = 7, max = 25)
     val password: String,
     val isOwner: Boolean,
 )
