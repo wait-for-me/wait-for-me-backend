@@ -1,0 +1,27 @@
+### 어드민 회원가입
+POST http://localhost:8080/v1/admin/sign-up
+Content-Type: application/json
+
+{
+  "email" : "test@email.com",
+  "password" : "12345678",
+  "name" : "어드민입니다만?"
+}
+
+### 어드민 로그인
+POST http://localhost:8080/v1/admin/sign-in
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "email" : "test@email.com",
+  "password" : "12345678"
+}
+
+//Saving a variable
+> {%
+client.global.set(
+"auth_token",
+"eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiIxIiwic3ViIjoi7Ja065Oc66-87J6F64uI64uk66eMPyIsImV4cCI6MTcwNjk4MDA1OSwiYXV0aG9yaXRpZXMiOiJBRE1JTiJ9.YRHSnyPiNUf8qvqP197XSOQMXgnl4CphmF_2fM1z30oygpWM434_p6LrA6m-JB5iOUYN0LxGmzUMngmmP9dXLQ"
+);
+%}

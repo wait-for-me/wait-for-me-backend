@@ -39,9 +39,9 @@ data class User(
 ) : BaseEntity(), UserDetails {
     override fun getAuthorities(): Collection<GrantedAuthority> {
         return if (isOwner) {
-            listOf<GrantedAuthority>(SimpleGrantedAuthority(UserRole.OWNER.name))
+            UserRole.OWNER.authorities.map { SimpleGrantedAuthority(it) }
         } else {
-            listOf<GrantedAuthority>(SimpleGrantedAuthority(UserRole.USER.name))
+            UserRole.USER.authorities.map { SimpleGrantedAuthority(it) }
         }
     }
 

@@ -39,7 +39,7 @@ class AdminService(
         return createAdminToken(admin).toAdminAuthResponse(authority = admin.authority)
     }
 
-    fun login(request: AdminAuthRequest): AdminAuthResponse {
+    fun signIn(request: AdminAuthRequest): AdminAuthResponse {
         return adminRepository.findAdminByEmail(email = request.email)?.let { admin ->
             if (admin.isDeleted!!) {
                 throw InvalidParameterException("탈퇴 처리된 어드민입니다.")

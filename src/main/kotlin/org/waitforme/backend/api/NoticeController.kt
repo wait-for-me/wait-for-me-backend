@@ -12,6 +12,7 @@ import org.waitforme.backend.model.request.notice.NoticeRequest
 import org.waitforme.backend.model.response.notice.NoticeListResponse
 import org.waitforme.backend.model.response.notice.NoticeResponse
 import org.waitforme.backend.service.NoticeService
+import javax.annotation.security.RolesAllowed
 
 @RestController
 @Tag(name = "공지 API")
@@ -37,7 +38,7 @@ class NoticeController(
     ): NoticeResponse =
         noticeService.findNotice(noticeId = id)
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')") // defaultPrefix 'ROLE'이 붙어야 해서 hasAuthority 대신 hasRole
     @PostMapping("")
     fun createNotice(
         @Parameter(hidden = true) @AuthenticationPrincipal loginAdmin: LoginAdmin,
@@ -45,7 +46,7 @@ class NoticeController(
     ): Int =
         noticeService.saveNotice(request = noticeRequest, loginAdmin = loginAdmin)
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     fun modifyNotice(
         @Parameter(hidden = true) @AuthenticationPrincipal loginAdmin: LoginAdmin,
@@ -54,7 +55,7 @@ class NoticeController(
     ): Int =
         noticeService.saveNotice(noticeId = id, request = noticeRequest, loginAdmin = loginAdmin)
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     fun deleteNotice(
         @Parameter(hidden = true) @AuthenticationPrincipal loginAdmin: LoginAdmin,

@@ -118,7 +118,7 @@ class JwtTokenProvider(
         // ROLE
         val id = claims.id.toInt()
         val role = claims[AUTHORITIES_KEY].toString()
-        val authorities = SimpleGrantedAuthority(role)
+        val authorities = UserRole.valueOf(role).authorities.map { SimpleGrantedAuthority(it) }
 
         val userDetails =
             when (role) {
@@ -147,7 +147,7 @@ class JwtTokenProvider(
                 }
             }
 
-        return UsernamePasswordAuthenticationToken(userDetails, token, listOf(authorities))
+        return UsernamePasswordAuthenticationToken(userDetails, token, authorities)
     }
 
     // Request Header에서 토큰 정보를 꺼내오기 위한 메소드
