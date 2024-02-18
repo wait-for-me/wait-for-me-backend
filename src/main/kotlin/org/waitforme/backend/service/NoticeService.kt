@@ -9,10 +9,7 @@ import org.waitforme.backend.enums.AdminMenuCode
 import org.waitforme.backend.model.LoginAdmin
 import org.waitforme.backend.model.request.notice.NoticeRequest
 import org.waitforme.backend.model.request.notice.toNoticeEntity
-import org.waitforme.backend.model.response.notice.NoticeListResponse
-import org.waitforme.backend.model.response.notice.NoticeResponse
-import org.waitforme.backend.model.response.notice.toNoticeListResponse
-import org.waitforme.backend.model.response.notice.toNoticeResponse
+import org.waitforme.backend.model.response.notice.*
 import org.waitforme.backend.repository.admin.AdminHistoryRepository
 import org.waitforme.backend.repository.notice.NoticeRepository
 import org.webjars.NotFoundException
@@ -32,7 +29,7 @@ class NoticeService(
             .toNoticeListResponse()
 
     @Transactional
-    fun saveNotice(noticeId: Int? = null, request: NoticeRequest, loginAdmin: LoginAdmin): Int {
+    fun saveNotice(noticeId: Int? = null, request: NoticeRequest, loginAdmin: LoginAdmin): NoticeSaveResponse {
         val notice = noticeRepository.save(request.toNoticeEntity(id = noticeId))
 
         noticeId?.let {
@@ -55,7 +52,7 @@ class NoticeService(
             )
         }
 
-        return notice.id
+        return NoticeSaveResponse(noticeId = notice.id)
     }
 
     @Transactional

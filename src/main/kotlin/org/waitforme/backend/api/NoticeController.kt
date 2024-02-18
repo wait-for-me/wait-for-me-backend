@@ -11,8 +11,8 @@ import org.waitforme.backend.model.LoginAdmin
 import org.waitforme.backend.model.request.notice.NoticeRequest
 import org.waitforme.backend.model.response.notice.NoticeListResponse
 import org.waitforme.backend.model.response.notice.NoticeResponse
+import org.waitforme.backend.model.response.notice.NoticeSaveResponse
 import org.waitforme.backend.service.NoticeService
-import javax.annotation.security.RolesAllowed
 
 @RestController
 @Tag(name = "공지 API")
@@ -43,7 +43,7 @@ class NoticeController(
     fun createNotice(
         @Parameter(hidden = true) @AuthenticationPrincipal loginAdmin: LoginAdmin,
         @RequestBody noticeRequest: NoticeRequest,
-    ): Int =
+    ): NoticeSaveResponse =
         noticeService.saveNotice(request = noticeRequest, loginAdmin = loginAdmin)
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -52,7 +52,7 @@ class NoticeController(
         @Parameter(hidden = true) @AuthenticationPrincipal loginAdmin: LoginAdmin,
         @Parameter(name = "id", description = "공지 ID", `in` = ParameterIn.PATH) @PathVariable id: Int,
         @RequestBody noticeRequest: NoticeRequest,
-    ): Int =
+    ): NoticeSaveResponse =
         noticeService.saveNotice(noticeId = id, request = noticeRequest, loginAdmin = loginAdmin)
 
     @PreAuthorize("hasRole('ADMIN')")

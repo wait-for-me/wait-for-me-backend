@@ -7,6 +7,7 @@ import org.waitforme.backend.common.BaseEntity
 import org.waitforme.backend.enums.GenderType
 import org.waitforme.backend.enums.Provider
 import org.waitforme.backend.enums.UserRole
+import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.persistence.*
 import javax.security.auth.message.AuthException
@@ -25,16 +26,16 @@ data class User(
     val provider: Provider,
     val phoneNumber: String,
     val snsId: String? = null,
-    val email: String? = null,
+    var email: String? = null,
     var name: String,
-    private val password: String? = null,
-    var birthedAt: LocalDateTime? = null,
+    private var password: String? = null,
+    var birthedAt: LocalDate? = null,
     var gender: GenderType? = null,
     val profileImage: String? = null,
-    val isOwner: Boolean = false,
-    val isAuth: Boolean = false, // 인증 여부, sns로 등록 시 자동 인증, local은 회원 가입 시 인증 절차 필요
-    val isAdult: Boolean = false,
-    val isDeleted: Boolean = false,
+    var isOwner: Boolean = false,
+    var isAuth: Boolean = false, // 인증 여부, sns로 등록 시 자동 인증, local은 회원 가입 시 인증 절차 필요
+    var isAdult: Boolean = false,
+    var isDeleted: Boolean = false,
     var deletedAt: LocalDateTime? = null,
 ) : BaseEntity(), UserDetails {
     override fun getAuthorities(): Collection<GrantedAuthority> {

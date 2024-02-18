@@ -3,20 +3,20 @@ package org.waitforme.backend.model.response.user
 import org.waitforme.backend.entity.user.User
 import org.waitforme.backend.enums.GenderType
 import org.waitforme.backend.enums.Provider
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 data class UserInfoResponse(
     val id: Int = 0,
     val provider: Provider,
     val phoneNumber: String,
-    val email: String? = null,
-    val name: String,
-    val birthedAt: LocalDateTime? = null,
-    val gender: GenderType? = null,
-    val profileImage: String? = null,
-    val isOwner: Boolean = false,
-    val isAuth: Boolean = false, // 인증 여부, sns로 등록 시 자동 인증, local은 회원 가입 시 인증 절차 필요
-    val isAdult: Boolean = false,
+    var email: String? = null,
+    var name: String,
+    var birthedAt: LocalDate? = null,
+    var gender: GenderType? = null,
+    var profileImage: String? = null,
+    var isOwner: Boolean = false,
+    var isAuth: Boolean = false, // 인증 여부, sns로 등록 시 자동 인증, local은 회원 가입 시 인증 절차 필요
+    var isAdult: Boolean = false,
 )
 
 fun User.toUserInfoResponse() = UserInfoResponse(
@@ -30,5 +30,5 @@ fun User.toUserInfoResponse() = UserInfoResponse(
     profileImage = profileImage,
     isOwner = isOwner,
     isAuth = isAuth,
-    isAdult = isAdult
+    isAdult = isAdult,
 )
