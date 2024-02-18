@@ -11,6 +11,6 @@ data class UserAuth(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
     val phoneNumber: String, // TODO : unique index 걸기
-    var requestedAt: LocalDateTime,
+    var requestedAt: LocalDateTime, // TODO : Long으로 바꾸기
     var authenticatedAt: LocalDateTime? = null,
 ) : BaseEntity()

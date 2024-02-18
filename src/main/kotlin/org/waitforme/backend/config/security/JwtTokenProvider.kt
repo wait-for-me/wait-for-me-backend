@@ -131,6 +131,7 @@ class JwtTokenProvider(
                 UserRole.USER.name -> {
                     userRepository.findByIdOrNull(id)?.let { user ->
                         // TODO : 확인 필요 - isOwner 체크 필요?
+                        // findByIdAndIsOwner(id, true) 으로 체크
                         user.toLoginUser()
                     } ?: throw UsernameNotFoundException(id.toString())
                 }
@@ -138,6 +139,7 @@ class JwtTokenProvider(
                 UserRole.OWNER.name -> {
                     userRepository.findByIdOrNull(id)?.let { user ->
                         // TODO : 확인 필요 - isOwner 체크 필요?
+                        // findByIdAndIsOwner(id, true) 으로 체크
                         user.toLoginUser()
                     } ?: throw UsernameNotFoundException(id.toString())
                 }
