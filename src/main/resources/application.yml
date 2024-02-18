@@ -31,3 +31,13 @@ jwt:
   token-secret-key: ThisIsTempSecretKeyWaitForMeThisIsTempSecretKeyWaitForMeThisIsTempSecretKeyWaitForMe
   access-token-valid-time: 1800000   # 30분
   refresh-token-valid-time: 3600000
+
+cloud:
+  aws:
+    s3:
+      bucket: dev-wait-for-me
+      stack.auto: false
+      region.static: ap-northeast-2
+      credentials:
+        access-key: access-key
+        secret-key: secret-key
