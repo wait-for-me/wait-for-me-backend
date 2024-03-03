@@ -41,12 +41,3 @@ cloud:
       credentials:
         access-key: access-key
         secret-key: secret-key
-cloud:
-  aws:
-    s3:
-      bucket: <bucket-name>
-      stack.auto: false
-      region.static: ap-northeast-2
-      credentials:
-        access-key: <access-key>
-        secret-key: <secret-key>

@@ -1,4 +1,4 @@
-package org.waitforme.backend.model.dto
+package org.waitforme.backend.model.dto.shop
 
 data class ShopListResultDto(
     val id: Int,

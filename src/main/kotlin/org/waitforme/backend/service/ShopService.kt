@@ -1,5 +1,6 @@
 package org.waitforme.backend.service
 
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -24,9 +25,10 @@ class ShopService(
     private val shopImageRepository: ShopImageRepository,
     private val imageUtil: ImageUtil,
 ) {
-    fun getShopList(pageRequest: PageRequest): List<ShopListResponse> {
+    fun getShopList(title: String?, pageRequest: PageRequest): Page<ShopListResponse> {
         val now = LocalDate.now()
         return shopRepository.findShopList(
+            title = title,
             startedAt = now,
             endedAt = now,
             pageable = pageRequest
@@ -39,6 +41,18 @@ class ShopService(
                 .map { it.toResponse() }
             shop.toFrontDetailResponse(images)
         } ?: throw NotFoundException("팝업을 찾을 수 없습니다.")
+    }
+
+    fun getOwnerShopList(userId: Int, title: String?, isShow: Boolean, pageRequest: PageRequest): Page<OwnerShopListResponse> {
+        val now = LocalDate.now()
+        return shopRepository.findOwnerShopList(
+            userId = userId,
+            title = title,
+            startedAt = now,
+            endedAt = now,
+            isShow = isShow,
+            pageable = pageRequest
+        ).map { it.toResponse() }
     }
 
     @Transactional
