@@ -34,10 +34,12 @@ jwt:
 
 cloud:
   aws:
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
     s3:
       bucket: dev-wait-for-me
-      stack.auto: false
-      region.static: ap-northeast-2
-      credentials:
-        access-key: access-key
-        secret-key: secret-key
+    credentials:
+      access-key: access-key
+      secret-key: secret-key
