@@ -41,3 +41,11 @@ cloud:
       credentials:
         access-key: access-key
         secret-key: secret-key
+sms:
+  fromNumber: 01012345678
+  apiKey: api-key
+  apiSecretKey: api-secret-key
+
+totp:
+  secret: ThisIsTempSecretKeyWaitForMeThisIsTempSecretKeyWaitForMeThisIsTempSecretKeyWaitForMe
+  validTime: 120000      # ms 기준
