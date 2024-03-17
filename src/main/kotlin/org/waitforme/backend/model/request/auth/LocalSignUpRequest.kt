@@ -10,6 +10,7 @@ data class LocalSignUpRequest(
     @field:Pattern(regexp = "010[0-9]{3,4}[0-9]{4}")
     val phoneNumber: String,
     @NotBlank
+    @field:Pattern(regexp = "^[a-zA-Z0-9]{1,8}\$")
     val name: String,
     @NotBlank
     @field:Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[\$@\$!%*#?&])[A-Za-z\\d\$@\$!%*#?&]{8,}\$")
