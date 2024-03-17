@@ -13,4 +13,6 @@ interface UserRepository : CrudRepository<User, Int> {
     fun findByProviderAndSnsId(provider: Provider, snsId: String): User?
 
     fun findByPhoneNumber(phoneNumber: String): User?
+
+    fun existsByName(name: String): Boolean
 }

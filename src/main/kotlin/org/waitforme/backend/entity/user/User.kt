@@ -17,6 +17,7 @@ import javax.security.auth.message.AuthException
     name = "`user`",
     indexes = [
         Index(name = "idx_phone_number", columnList = "phoneNumber", unique = true), // index (unique = false (default))
+        Index(name = "idx_name", columnList = "name", unique = true),
     ],
 )
 data class User(

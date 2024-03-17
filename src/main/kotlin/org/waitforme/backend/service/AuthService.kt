@@ -14,7 +14,9 @@ import org.waitforme.backend.enums.UserRole
 import org.waitforme.backend.model.dto.JwtDto
 import org.waitforme.backend.model.request.auth.*
 import org.waitforme.backend.model.response.auth.AuthResponse
+import org.waitforme.backend.model.response.auth.CheckNameResponse
 import org.waitforme.backend.model.response.auth.toAuthResponse
+import org.waitforme.backend.model.response.auth.toCheckNameResponse
 import org.waitforme.backend.repository.user.UserAuthRepository
 import org.waitforme.backend.repository.user.UserRefreshTokenRepository
 import org.waitforme.backend.repository.user.UserRepository
@@ -231,5 +233,9 @@ class AuthService(
         )
 
         return user.toAuthResponse(token)
+    }
+
+    fun checkDuplicateName(request: CheckNameRequest): CheckNameResponse {
+        return userRepository.existsByName(request.name).toCheckNameResponse()
     }
 }

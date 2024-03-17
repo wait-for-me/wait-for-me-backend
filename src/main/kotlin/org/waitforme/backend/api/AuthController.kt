@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*
 import org.waitforme.backend.model.dto.JwtDto
 import org.waitforme.backend.model.request.auth.*
 import org.waitforme.backend.model.response.auth.AuthResponse
+import org.waitforme.backend.model.response.auth.CheckNameResponse
 import org.waitforme.backend.service.AuthService
 import javax.validation.Valid
 
@@ -67,5 +68,13 @@ class AuthController(
         @Valid @RequestBody request: SnsSignInRequest,
     ): AuthResponse {
         return authService.signInSns(request = request)
+    }
+
+    @Operation(summary = "닉네임(LOCAL 이름) 중복 체크", description = "닉네임(LOCAL 이름)의 중복 여부를 체크합니다.")
+    @PostMapping("/check/name")
+    fun checkDuplicateName(
+        request: CheckNameRequest,
+    ): CheckNameResponse {
+        return authService.checkDuplicateName(request = request)
     }
 }
