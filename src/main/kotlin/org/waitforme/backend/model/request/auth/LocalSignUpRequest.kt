@@ -5,7 +5,6 @@ import org.waitforme.backend.entity.user.User
 import org.waitforme.backend.enums.Provider
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Pattern
-import javax.validation.constraints.Size
 
 data class LocalSignUpRequest(
     @field:Pattern(regexp = "010[0-9]{3,4}[0-9]{4}")
@@ -13,7 +12,7 @@ data class LocalSignUpRequest(
     @NotBlank
     val name: String,
     @NotBlank
-    @field:Size(min = 7, max = 25)
+    @field:Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[\$@\$!%*#?&])[A-Za-z\\d\$@\$!%*#?&]{8,}\$")
     val password: String,
 )
 
