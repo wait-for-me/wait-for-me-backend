@@ -11,6 +11,7 @@ data class SnsSignUpRequest(
     val snsId: String,
     @field:Pattern(regexp = "010[0-9]{3,4}[0-9]{4}")
     val phoneNumber: String,
+    val isOwner: Boolean,
     val name: String,
     val email: String? = null,
     val birthedAt: LocalDate? = null,
@@ -18,7 +19,7 @@ data class SnsSignUpRequest(
     val profileImage: String? = null,
 )
 
-fun SnsSignUpRequest.toUserEntity(isOwner: Boolean, isAuth: Boolean) = User(
+fun SnsSignUpRequest.toUserEntity(isAuth: Boolean) = User(
     provider = provider,
     snsId = snsId,
     phoneNumber = phoneNumber,

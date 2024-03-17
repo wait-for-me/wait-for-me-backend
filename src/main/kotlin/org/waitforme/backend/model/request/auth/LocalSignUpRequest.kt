@@ -15,9 +15,10 @@ data class LocalSignUpRequest(
     @NotBlank
     @field:Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[\$@\$!%*#?&])[A-Za-z\\d\$@\$!%*#?&]{8,}\$")
     val password: String,
+    val isOwner: Boolean
 )
 
-fun LocalSignUpRequest.toUserEntity(encoder: PasswordEncoder, isOwner: Boolean, isAuth: Boolean) = User(
+fun LocalSignUpRequest.toUserEntity(encoder: PasswordEncoder, isAuth: Boolean) = User(
     provider = Provider.LOCAL,
     phoneNumber = phoneNumber,
     password = encoder.encode(password),

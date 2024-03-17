@@ -122,7 +122,7 @@ class AuthService(
             it.authenticatedAt?.let { userAuthAt ->
                 if (Duration.between(userAuthAt, LocalDateTime.now()).toMinutes() < 15) {
                     // 인증 완료 시 회원가입 완료
-                    val user = userRepository.save(request.toUserEntity(encoder, isOwner = false, isAuth = true))
+                    val user = userRepository.save(request.toUserEntity(encoder, isAuth = true))
                     val token = jwtTokenProvider.createJwt(
                         id = user.id,
                         account = user.phoneNumber,
@@ -202,7 +202,7 @@ class AuthService(
         }
 
         // sns는 인증 불필요하여 이미 등록된 계정 아니면 저장
-        val user = userRepository.save(request.toUserEntity(isOwner = false, isAuth = true))
+        val user = userRepository.save(request.toUserEntity(isAuth = true))
         val token = jwtTokenProvider.createJwt(
             id = user.id,
             account = user.phoneNumber,
