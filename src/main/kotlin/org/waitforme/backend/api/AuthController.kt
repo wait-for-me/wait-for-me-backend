@@ -4,10 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.*
 import org.waitforme.backend.model.dto.JwtDto
-import org.waitforme.backend.model.request.auth.LocalAuthRequest
-import org.waitforme.backend.model.request.auth.LocalRefreshTokenRequest
-import org.waitforme.backend.model.request.auth.LocalSignInRequest
-import org.waitforme.backend.model.request.auth.LocalSignUpRequest
+import org.waitforme.backend.model.request.auth.*
 import org.waitforme.backend.model.response.auth.AuthResponse
 import org.waitforme.backend.service.AuthService
 import javax.validation.Valid
@@ -54,5 +51,21 @@ class AuthController(
     @PostMapping("/local/refresh")
     fun refresh(@RequestBody request: LocalRefreshTokenRequest): JwtDto {
         return authService.refresh(request.refreshToken)
+    }
+
+    @Operation(summary = "SNS 회원가입", description = "SNS 회원가입을 합니다.")
+    @PostMapping("/sns/sign-up")
+    fun signUpSns(
+        @Valid @RequestBody request: SnsSignUpRequest,
+    ): AuthResponse {
+        return authService.signUpSns(request = request)
+    }
+
+    @Operation(summary = "SNS 로그인", description = "SNS 로그인을 합니다.")
+    @PostMapping("/sns/sign-in")
+    fun signInSns(
+        @Valid @RequestBody request: SnsSignInRequest,
+    ): AuthResponse {
+        return authService.signInSns(request = request)
     }
 }
