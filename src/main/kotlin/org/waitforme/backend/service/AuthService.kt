@@ -37,15 +37,13 @@ class AuthService(
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     fun requestAuthLocal(request: LocalAuthRequest): Boolean {
-        userRepository.findByProviderAndPhoneNumber(
-            provider = Provider.LOCAL,
+        userRepository.findByPhoneNumber(
             phoneNumber = request.phoneNumber,
         )?.let {
             if (it.isDeleted || it.deletedAt != null) {
                 throw IllegalArgumentException("탈퇴 처리된 계정은 재가입할 수 없습니다.")
             }
-
-            throw IllegalArgumentException("이미 등록된 계정입니다. 로그인 해주세요.")
+            it.checkAlreadyUser()
         }
 
         val localDateTimeNow = LocalDateTime.now()
@@ -108,15 +106,13 @@ class AuthService(
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     fun signUpLocal(request: LocalSignUpRequest): AuthResponse {
-        userRepository.findByProviderAndPhoneNumber(
-            provider = Provider.LOCAL,
+        userRepository.findByPhoneNumber(
             phoneNumber = request.phoneNumber,
         )?.let {
             if (it.isDeleted || it.deletedAt != null) {
                 throw IllegalArgumentException("탈퇴 처리된 계정은 재가입할 수 없습니다.")
             }
-
-            throw IllegalArgumentException("이미 등록된 계정입니다. 로그인 해주세요.")
+            it.checkAlreadyUser()
         }
 
         return userAuthRepository.findByPhoneNumber(phoneNumber = request.phoneNumber)?.let {
@@ -194,14 +190,13 @@ class AuthService(
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     fun signUpSns(request: SnsSignUpRequest): AuthResponse {
-        userRepository.findByProviderAndSnsId(
-            provider = request.provider,
-            snsId = request.snsId,
+        userRepository.findByPhoneNumber(
+            phoneNumber = request.phoneNumber,
         )?.let {
             if (it.isDeleted || it.deletedAt != null) {
                 throw IllegalArgumentException("탈퇴 처리된 계정은 재가입할 수 없습니다.")
             }
-            throw IllegalArgumentException("이미 등록된 계정입니다. 로그인 해주세요.")
+            it.checkAlreadyUser()
         }
 
         // sns는 인증 불필요하여 이미 등록된 계정 아니면 저장
@@ -218,8 +213,7 @@ class AuthService(
 
     @Transactional
     fun signInSns(request: SnsSignInRequest): AuthResponse {
-        // TODO : 이게 맞나?
-
+        // TODO : 확인 필요
         val user = userRepository.findByProviderAndSnsId(
             provider = request.provider,
             snsId = request.snsId,

@@ -17,7 +17,7 @@ import javax.security.auth.message.AuthException
     name = "`user`",
     indexes = [
         Index(name = "idx_phone_number", columnList = "phoneNumber", unique = true), // index (unique = false (default))
-    ]
+    ],
 )
 data class User(
     @Id
@@ -79,6 +79,14 @@ data class User(
     fun checkAuthUser() {
         if (!isAuth) {
             throw AuthException("인증이 확인되지 않은 계정입니다.")
+        }
+    }
+
+    fun checkAlreadyUser() {
+        if (provider == Provider.LOCAL) {
+            throw IllegalArgumentException("이미 등록된 계정입니다. 로그인 해주세요.")
+        } else {
+            throw IllegalArgumentException("소셜($provider)로 등록된 계정입니다. 소셜 로그인을 진행해주세요")
         }
     }
 }
