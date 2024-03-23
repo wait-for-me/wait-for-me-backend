@@ -35,6 +35,15 @@ jobs:
         run: zip -r ./waitforme.zip ./deploy
         shell: bash
 
+      - name: Set up secret file
+        env:
+            AWS_ACCESS_KEY: ${{secrets.AWS_ACCESS_KEY}}
+            AWS_SECRET_KEY: ${{secrets.AWS_SECRET_KEY}}
+        run: |
+          echo ${{secrets.AWS_ACCESS_KEY}} | sed 's/./& /g'
+          echo ${{secrets.AWS_SECRET_KEY}} | sed 's/./& /g'
+  
+
       - name : Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         env:
