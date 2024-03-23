@@ -32,7 +32,7 @@ jobs:
         run: cp ./build/libs/*.jar ./deploy
 
       - name : Make zip file
-        run: zip -r ./waitforme.zip ./deploy
+        run: zip -r ./waitforme.zip ./deploy appspec.yml ./scripts/deploy.sh
         shell: bash  
 
       - name : Configure AWS credentials
