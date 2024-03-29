@@ -48,6 +48,13 @@ dependencies {
 	implementation("javax.persistence:javax.persistence-api:2.2")
 	annotationProcessor(group = "com.querydsl", name = "querydsl-apt", classifier = "jpa")
 	implementation("com.querydsl:querydsl-apt:$queryDSLVersion")
+
+    // validation
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    // sms api
+    implementation("net.nurigo:sdk:4.2.9")
+    // totp
+    implementation("dev.turingcomplete:kotlin-onetimepassword:2.4.0")
 }
 
 tasks.withType<KotlinCompile> {

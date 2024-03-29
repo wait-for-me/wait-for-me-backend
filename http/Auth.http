@@ -1,0 +1,43 @@
+### 로컬 회원가입 인증 요청
+POST http://localhost:8080/v1/auth/local
+Content-Type: application/json
+
+{
+  "phoneNumber" : "01012345678"
+}
+
+### 로컬 회원가입 인증 확인
+PUT http://localhost:8080/v1/auth/local
+Content-Type: application/json
+
+{
+  "phoneNumber" : "01012345678",
+  "authText" : "722861"
+}
+
+### 로컬 회원가입
+POST http://localhost:8080/v1/auth/local/sign-up
+Content-Type: application/json
+
+{
+  "phoneNumber" : "01012345678",
+  "name" : "테스트입니다.",
+  "password" : "1234567"
+}
+
+### 로컬 로그인
+POST http://localhost:8080/v1/auth/local/sign-in
+Content-Type: application/json
+
+{
+  "phoneNumber" : "01012345678",
+  "password" : "1234567"
+}
+
+### 리프레시 토큰
+POST http://localhost:8080/v1/auth/local/refresh
+Content-Type: application/json
+
+{
+  "refreshToken" : "eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiIxIiwic3ViIjoi7YWM7Iqk7Yq47J6F64uI64ukLiIsImV4cCI6MTcwNjk3MzY5NSwiYXV0aG9yaXRpZXMiOiJVU0VSIn0.LULzWQvO33wOd7VCq4n3pkA-42HrxgxylA63ri37qzpivVAK_Sn6D6e5hka_Xp4pMS5aVAkxWH9p443_4QUVPg"
+}

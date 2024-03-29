@@ -25,10 +25,10 @@ class AdminController(
     ): AdminAuthResponse = adminService.signUp(request)
 
     @PreAuthorize("permitAll()")
-    @PostMapping("/login")
-    fun loginAdmin(
+    @PostMapping("/sign-in")
+    fun signInAdmin(
         @RequestBody request: AdminAuthRequest,
-    ): AdminAuthResponse = adminService.login(request)
+    ): AdminAuthResponse = adminService.signIn(request)
 
     // TODO : 관리자 승인 및 권한 설정해주는 API 만들기
 }

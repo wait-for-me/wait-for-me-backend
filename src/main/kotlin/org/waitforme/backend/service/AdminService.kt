@@ -20,8 +20,12 @@ class AdminService(
 ) {
 
     fun signUp(request: AdminAuthRequest): AdminAuthResponse {
-        val admin = adminRepository.findAdminByEmailAndIsDeleted(email = request.email, isDeleted = false)?.let {
-            throw InvalidParameterException("이미 가입된 어드민입니다.") // TODO : 예외 세분화하기
+        val admin = adminRepository.findAdminByEmail(email = request.email)?.let { admin ->
+            if (admin.isDeleted!!) {
+                throw InvalidParameterException("탈퇴 처리된 어드민입니다.")
+            } else {
+                throw InvalidParameterException("이미 가입된 어드민입니다.")
+            }
         } ?: run {
             adminRepository.save(
                 Admin(
@@ -35,11 +39,15 @@ class AdminService(
         return createAdminToken(admin).toAdminAuthResponse(authority = admin.authority)
     }
 
-    fun login(request: AdminAuthRequest): AdminAuthResponse {
-        return adminRepository.findAdminByEmailAndIsDeleted(email = request.email, isDeleted = false)?.let { admin ->
-            when (passwordEncoder.matches(request.password, admin.password)) {
-                true -> createAdminToken(admin).toAdminAuthResponse(authority = admin.authority)
-                false -> throw InvalidParameterException("잘못된 비밀번호입니다.")
+    fun signIn(request: AdminAuthRequest): AdminAuthResponse {
+        return adminRepository.findAdminByEmail(email = request.email)?.let { admin ->
+            if (admin.isDeleted!!) {
+                throw InvalidParameterException("탈퇴 처리된 어드민입니다.")
+            } else {
+                when (passwordEncoder.matches(request.password, admin.password)) {
+                    true -> createAdminToken(admin).toAdminAuthResponse(authority = admin.authority)
+                    false -> throw InvalidParameterException("잘못된 비밀번호입니다.")
+                }
             }
         } ?: throw InvalidParameterException("유효하지 않은 관리자입니다.")
     }
@@ -47,7 +55,7 @@ class AdminService(
     private fun createAdminToken(admin: Admin) =
         jwtTokenProvider.createJwt(
             id = admin.id,
-            email = admin.email,
+            account = admin.email,
             name = admin.name ?: "",
             role = UserRole.ADMIN,
         )

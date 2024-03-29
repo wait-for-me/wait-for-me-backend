@@ -1,0 +1,17 @@
+### 어드민 회원가입
+POST http://localhost:8080/v1/notice
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "title" : "어드민의 공지입니다",
+  "contents" : "어드민은 공지가 하고 싶어~"
+}
+
+//Saving a variable
+> {%
+client.global.set(
+"auth_token",
+"eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiIxIiwic3ViIjoi7Ja065Oc66-87J6F64uI64uk66eMPyIsImV4cCI6MTcwNjk4NDAyMSwiYXV0aG9yaXRpZXMiOiJBRE1JTiJ9.xBC_9MnwCyrJ27JEVi_1pQ5Diz5eqD6XA1jw6AX30-UPuN66TEtu8A2ztAONZq-AGZh1vXueJz9rOFvbV2osHg"
+);
+%}

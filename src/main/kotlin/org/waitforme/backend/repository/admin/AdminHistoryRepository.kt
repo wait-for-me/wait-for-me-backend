@@ -2,9 +2,8 @@ package org.waitforme.backend.repository.admin
 
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
-import org.waitforme.backend.entity.admin.Admin
+import org.waitforme.backend.entity.admin.AdminHistory
 
 @Repository
-interface AdminRepository : CrudRepository<Admin, Int> {
-    fun findAdminByEmail(email: String): Admin?
+interface AdminHistoryRepository: CrudRepository<AdminHistory, Int> {
 }

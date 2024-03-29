@@ -24,7 +24,7 @@ data class Admin(
 ) : BaseEntity(),
     UserDetails {
     override fun getAuthorities(): Collection<GrantedAuthority> {
-        return listOf<GrantedAuthority>(SimpleGrantedAuthority(UserRole.ADMIN.name))
+        return UserRole.ADMIN.authorities.map { SimpleGrantedAuthority(it) }
     }
 
     override fun getPassword(): String {

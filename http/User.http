@@ -1,0 +1,35 @@
+### 유저 정보 조회
+GET http://localhost:8080/v1/user/info
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+//Saving a variable
+> {%
+client.global.set(
+"auth_token",
+"eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiIxIiwic3ViIjoi7YWM7Iqk7Yq47J6F64uI64ukLiIsImV4cCI6MTcwNjk3MzIwNywiYXV0aG9yaXRpZXMiOiJVU0VSIn0.jq_Rv5iBtXY968gnmONu6a43VC5pACrhfxhBkaC5WX0ep6rmhLvOmaTZUSfJEMdj8imW87EtWMMoxqXKKeqtVw"
+);
+%}
+
+### 유저 정보 수정
+PUT http://localhost:8080/v1/user/info
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+//{
+//  "name" : "테스트라구요!",
+//  "birthedAt" : "2023-01-18T11:22:33",
+//  "gender" : "FEMALE"
+//}
+
+{
+  "name" : "최종 찐 테스트라구요!"
+}
+
+//Saving a variable
+> {%
+client.global.set(
+"auth_token",
+"eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiIxIiwic3ViIjoi7YWM7Iqk7Yq47J6F64uI64ukLiIsImV4cCI6MTcwNjk3NjE2OCwiYXV0aG9yaXRpZXMiOiJVU0VSIn0.NwTfnJ-Tv-e9X7RSsZt3X8S5Z5R6kbmeFsp2klFrbZTHiQL6GHhsg6gtNx6ai6WX1kzTxceal1F-QQRbi-eJZg"
+);
+%}
