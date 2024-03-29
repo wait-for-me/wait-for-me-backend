@@ -32,7 +32,7 @@ data class Shop(
         this.isShow = isShow
     }
 
-    fun update(updateShopRequest: UpdateShopRequest, ) {
+    fun update(updateShopRequest: UpdateShopRequest) {
         updateShopRequest.registrationNumber?.let { this.registrationNumber = it }
         updateShopRequest.category?.let { this.category = it }
         updateShopRequest.title?.let { this.name = it }
