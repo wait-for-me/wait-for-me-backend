@@ -61,3 +61,14 @@ springdoc:
     disable-swagger-default-url: true
     display-request-duration: true
     operations-sorter: alpha
+
+management:
+  endpoints:
+    web:
+      base-path: /     # http://localhost:8080/health
+  endpoint:
+    health:
+      show-details: always
+  health:
+    diskspace:
+      enabled: false

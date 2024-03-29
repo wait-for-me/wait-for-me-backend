@@ -33,6 +33,7 @@ class SecurityConfig(
     private val allowedUrls =
         arrayOf(
             "/",
+            "/health",
             "/v1/admin/sign-up",
             "/v1/admin/login",
             "/v1/auth/**",

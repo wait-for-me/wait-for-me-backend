@@ -55,6 +55,10 @@ dependencies {
     implementation("net.nurigo:sdk:4.2.9")
     // totp
     implementation("dev.turingcomplete:kotlin-onetimepassword:2.4.0")
+
+    // health-check
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+
 }
 
 tasks.withType<KotlinCompile> {
