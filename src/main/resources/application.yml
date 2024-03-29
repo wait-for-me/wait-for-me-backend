@@ -51,3 +51,24 @@ sms:
 totp:
   secret: ThisIsTempSecretKeyWaitForMeThisIsTempSecretKeyWaitForMeThisIsTempSecretKeyWaitForMe
   validTime: 120000      # ms 기준
+
+springdoc:
+  packages-to-scan: org.waitforme.backend.api
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /
+    disable-swagger-default-url: true
+    display-request-duration: true
+    operations-sorter: alpha
+
+management:
+  endpoints:
+    web:
+      base-path: /     # http://localhost:8080/health
+  endpoint:
+    health:
+      show-details: always
+  health:
+    diskspace:
+      enabled: false

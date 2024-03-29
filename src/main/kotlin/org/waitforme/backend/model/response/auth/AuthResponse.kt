@@ -8,7 +8,6 @@ data class AuthResponse(
     val phoneNumber: String,
     val name: String,
     val isOwner: Boolean,
-    val isAuth: Boolean,
     val accessToken: TokenDto,
     val refreshToken: TokenDto,
 )
@@ -19,5 +18,4 @@ fun User.toAuthResponse(token: JwtDto) = AuthResponse(
     phoneNumber = phoneNumber,
     name = name,
     isOwner = isOwner,
-    isAuth = isAuth
 )

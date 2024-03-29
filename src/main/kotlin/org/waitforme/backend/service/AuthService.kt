@@ -12,12 +12,11 @@ import org.waitforme.backend.entity.user.UserAuth
 import org.waitforme.backend.enums.Provider
 import org.waitforme.backend.enums.UserRole
 import org.waitforme.backend.model.dto.JwtDto
-import org.waitforme.backend.model.request.auth.LocalAuthRequest
-import org.waitforme.backend.model.request.auth.LocalSignInRequest
-import org.waitforme.backend.model.request.auth.LocalSignUpRequest
-import org.waitforme.backend.model.request.auth.toUserEntity
+import org.waitforme.backend.model.request.auth.*
 import org.waitforme.backend.model.response.auth.AuthResponse
+import org.waitforme.backend.model.response.auth.CheckNameResponse
 import org.waitforme.backend.model.response.auth.toAuthResponse
+import org.waitforme.backend.model.response.auth.toCheckNameResponse
 import org.waitforme.backend.repository.user.UserAuthRepository
 import org.waitforme.backend.repository.user.UserRefreshTokenRepository
 import org.waitforme.backend.repository.user.UserRepository
@@ -40,15 +39,13 @@ class AuthService(
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     fun requestAuthLocal(request: LocalAuthRequest): Boolean {
-        userRepository.findByProviderAndPhoneNumber(
-            provider = Provider.LOCAL,
+        userRepository.findByPhoneNumber(
             phoneNumber = request.phoneNumber,
         )?.let {
             if (it.isDeleted || it.deletedAt != null) {
                 throw IllegalArgumentException("탈퇴 처리된 계정은 재가입할 수 없습니다.")
             }
-
-            throw IllegalArgumentException("이미 등록된 계정입니다. 로그인 해주세요.")
+            it.checkAlreadyUser()
         }
 
         val localDateTimeNow = LocalDateTime.now()
@@ -75,7 +72,8 @@ class AuthService(
             ),
         )
 
-        val authText = totpUtil.generateTotp(date = Date.from(localDateTimeNow.atZone(ZoneId.systemDefault()).toInstant()))
+        val authText =
+            totpUtil.generateTotp(date = Date.from(localDateTimeNow.atZone(ZoneId.systemDefault()).toInstant()))
 //        println("authText : $authText")
 
         // 전송 완료되면 true, 아니면 false
@@ -110,15 +108,13 @@ class AuthService(
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     fun signUpLocal(request: LocalSignUpRequest): AuthResponse {
-        userRepository.findByProviderAndPhoneNumber(
-            provider = Provider.LOCAL,
+        userRepository.findByPhoneNumber(
             phoneNumber = request.phoneNumber,
         )?.let {
             if (it.isDeleted || it.deletedAt != null) {
                 throw IllegalArgumentException("탈퇴 처리된 계정은 재가입할 수 없습니다.")
             }
-
-            throw IllegalArgumentException("이미 등록된 계정입니다. 로그인 해주세요.")
+            it.checkAlreadyUser()
         }
 
         return userAuthRepository.findByPhoneNumber(phoneNumber = request.phoneNumber)?.let {
@@ -126,7 +122,7 @@ class AuthService(
             it.authenticatedAt?.let { userAuthAt ->
                 if (Duration.between(userAuthAt, LocalDateTime.now()).toMinutes() < 15) {
                     // 인증 완료 시 회원가입 완료
-                    val user = userRepository.save(request.toUserEntity(encoder, isOwner = false, isAuth = true))
+                    val user = userRepository.save(request.toUserEntity(encoder, isAuth = true))
                     val token = jwtTokenProvider.createJwt(
                         id = user.id,
                         account = user.phoneNumber,
@@ -192,5 +188,54 @@ class AuthService(
         userRefreshToken.updateRefreshToken(token.refreshToken.token) // 새로 발급받은 refreshToken을 저장
 
         return token
+    }
+
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    fun signUpSns(request: SnsSignUpRequest): AuthResponse {
+        userRepository.findByPhoneNumber(
+            phoneNumber = request.phoneNumber,
+        )?.let {
+            if (it.isDeleted || it.deletedAt != null) {
+                throw IllegalArgumentException("탈퇴 처리된 계정은 재가입할 수 없습니다.")
+            }
+            it.checkAlreadyUser()
+        }
+
+        // sns는 인증 불필요하여 이미 등록된 계정 아니면 저장
+        val user = userRepository.save(request.toUserEntity(isAuth = true))
+        val token = jwtTokenProvider.createJwt(
+            id = user.id,
+            account = user.phoneNumber,
+            name = user.name,
+            role = UserRole.USER,
+        )
+
+        return user.toAuthResponse(token)
+    }
+
+    @Transactional
+    fun signInSns(request: SnsSignInRequest): AuthResponse {
+        // TODO : 확인 필요
+        val user = userRepository.findByProviderAndSnsId(
+            provider = request.provider,
+            snsId = request.snsId,
+        )?.let { user ->
+            user.checkAuthUser()
+            user.checkDeletedUser()
+            user
+        } ?: throw AuthException("존재하지 않는 회원입니다. 회원 가입을 진행해주세요.")
+
+        val token = jwtTokenProvider.createJwt(
+            id = user.id,
+            account = user.phoneNumber,
+            name = user.name,
+            role = UserRole.USER,
+        )
+
+        return user.toAuthResponse(token)
+    }
+
+    fun checkDuplicateName(request: CheckNameRequest): CheckNameResponse {
+        return userRepository.existsByName(request.name).toCheckNameResponse()
     }
 }

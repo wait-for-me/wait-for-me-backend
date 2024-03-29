@@ -23,15 +23,22 @@ class SecurityConfig(
     private val jwtAccessDeniedHandler: JwtAccessDeniedHandler,
 ) : SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity>() {
 
+    private val swaggerPatterns = arrayOf(
+        "/swagger-resources/**",
+        "/swagger-ui/**",
+        "/v3/api-docs/**",
+        "/v3/api-docs",
+    )
+
     private val allowedUrls =
         arrayOf(
             "/",
-            "/swagger-ui/**",
+            "/health",
             "/v1/admin/sign-up",
             "/v1/admin/login",
             "/v1/auth/**",
             "/v1/notice/**",
-        )
+        ) + swaggerPatterns
 
     @Bean
     fun passwordEncoder(): PasswordEncoder {

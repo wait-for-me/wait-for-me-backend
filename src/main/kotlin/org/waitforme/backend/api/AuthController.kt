@@ -4,11 +4,9 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.*
 import org.waitforme.backend.model.dto.JwtDto
-import org.waitforme.backend.model.request.auth.LocalAuthRequest
-import org.waitforme.backend.model.request.auth.LocalRefreshTokenRequest
-import org.waitforme.backend.model.request.auth.LocalSignInRequest
-import org.waitforme.backend.model.request.auth.LocalSignUpRequest
+import org.waitforme.backend.model.request.auth.*
 import org.waitforme.backend.model.response.auth.AuthResponse
+import org.waitforme.backend.model.response.auth.CheckNameResponse
 import org.waitforme.backend.service.AuthService
 import javax.validation.Valid
 
@@ -54,5 +52,29 @@ class AuthController(
     @PostMapping("/local/refresh")
     fun refresh(@RequestBody request: LocalRefreshTokenRequest): JwtDto {
         return authService.refresh(request.refreshToken)
+    }
+
+    @Operation(summary = "SNS 회원가입", description = "SNS 회원가입을 합니다.")
+    @PostMapping("/sns/sign-up")
+    fun signUpSns(
+        @Valid @RequestBody request: SnsSignUpRequest,
+    ): AuthResponse {
+        return authService.signUpSns(request = request)
+    }
+
+    @Operation(summary = "SNS 로그인", description = "SNS 로그인을 합니다.")
+    @PostMapping("/sns/sign-in")
+    fun signInSns(
+        @Valid @RequestBody request: SnsSignInRequest,
+    ): AuthResponse {
+        return authService.signInSns(request = request)
+    }
+
+    @Operation(summary = "닉네임(LOCAL 이름) 중복 체크", description = "닉네임(LOCAL 이름)의 중복 여부를 체크합니다.")
+    @PostMapping("/check/name")
+    fun checkDuplicateName(
+        request: CheckNameRequest,
+    ): CheckNameResponse {
+        return authService.checkDuplicateName(request = request)
     }
 }
