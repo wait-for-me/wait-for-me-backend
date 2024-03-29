@@ -1,9 +1,6 @@
 package org.waitforme.backend.model.response.shop
 
-import org.waitforme.backend.entity.shop.Shop
-import org.waitforme.backend.entity.shop.ShopImage
-import org.waitforme.backend.model.dto.ShopListResultDto
-import javax.swing.border.TitledBorder
+import org.waitforme.backend.model.dto.shop.ShopListResultDto
 
 data class ShopListResponse(
     val id: Int,

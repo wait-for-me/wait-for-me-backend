@@ -1,13 +1,19 @@
 package org.waitforme.backend.api
 
+import com.amazonaws.services.ec2.model.DefaultRouteTableAssociationValue
+import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.tags.Tag
+import jdk.jfr.ContentType
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.MediaType
+import org.springframework.web.bind.annotation.*
+import org.waitforme.backend.model.request.CreateShopRequest
+import org.waitforme.backend.model.request.UpdateShopRequest
+import org.waitforme.backend.model.response.shop.FrontShopDetailResponse
+import org.waitforme.backend.model.response.shop.OwnerShopListResponse
 import org.waitforme.backend.model.response.shop.ShopDetailResponse
 import org.waitforme.backend.model.response.shop.ShopListResponse
 import org.waitforme.backend.service.ShopService
@@ -20,18 +26,66 @@ class ShopController(
 ) {
     @GetMapping("")
     fun getShopList(
+        @Parameter(name = "title", description = "제목", `in` = ParameterIn.QUERY)
+        title: String? = null,
         @Parameter(name = "page", description = "0페이지부터 시작", `in` = ParameterIn.QUERY)
         page: Int? = 0,
         @Parameter(name = "size", description = "1페이지 당 크기", `in` = ParameterIn.QUERY)
         size: Int? = 10,
-    ): List<ShopListResponse> =
-        shopService.getShopList(PageRequest.of(page ?: 0, size ?: 10))
+    ): Page<ShopListResponse> =
+        shopService.getShopList(title, PageRequest.of(page ?: 0, size ?: 10))
 
     @GetMapping("/{id}")
     fun getShopDetail(
         @Parameter(name = "id", description = "팝업 ID", `in` = ParameterIn.PATH)
         @PathVariable
         id: Int
-    ): ShopDetailResponse =
+    ): FrontShopDetailResponse =
         shopService.getShopDetail(id)
+
+    @GetMapping("/owner")
+    fun getOwnerShopList(
+        // TODO: 추후 삭제 예정
+        @Parameter(name = "userId", description = "점주 ID", `in` = ParameterIn.QUERY)
+        userId: Int,
+        @Parameter(name = "title", description = "제목", `in` = ParameterIn.QUERY)
+        title: String? = null,
+        @Parameter(name = "isShow", description = "노출 여부", `in` = ParameterIn.QUERY)
+        isShow: Boolean = true,
+        @Parameter(name = "page", description = "0페이지부터 시작", `in` = ParameterIn.QUERY)
+        page: Int? = 0,
+        @Parameter(name = "size", description = "1페이지 당 크기", `in` = ParameterIn.QUERY)
+        size: Int? = 10,
+    ): Page<OwnerShopListResponse> =
+        shopService.getOwnerShopList(userId, title, isShow, PageRequest.of(page ?: 0, size ?: 10))
+
+    // BACKOFFICE
+    @PostMapping("", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    @Operation(description = "BACKOFFICE - 팝업스토어 등록")
+    fun createShop(
+        // TODO: 관리자 체크 로직 추가
+        @ModelAttribute
+        shopRequest: CreateShopRequest,
+    ): ShopDetailResponse =
+        shopService.createShop(shopRequest)
+
+    @PutMapping("/{id}", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    @Operation(description = "BACKOFFICE - 팝업스토어 수정")
+    fun updateShop(
+        @Parameter(name = "id", description = "팝업 스토어 id", `in` = ParameterIn.PATH)
+        @PathVariable id: Int,
+        @ModelAttribute
+        shopRequest: UpdateShopRequest,
+    ): ShopDetailResponse =
+        shopService.updateShop(id, shopRequest)
+
+
+    @PutMapping("/show/{id}")
+    fun changeExposure(
+        @Parameter(name = "id", description = "팝업 ID", `in` = ParameterIn.PATH)
+        @PathVariable
+        id: Int,
+        @Parameter(name = "isShow", description = "노출 상태", `in` = ParameterIn.QUERY)
+        isShow: Boolean
+    ): Boolean = shopService.changeExposure(id, isShow)
 }
