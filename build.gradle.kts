@@ -32,6 +32,9 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("org.springdoc:springdoc-openapi-ui:1.6.11")
 
+	implementation ("com.google.code.gson:gson:2.8.7")
+	implementation ("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
+
     implementation("io.jsonwebtoken:jjwt-api:0.11.2")
     implementation("io.jsonwebtoken:jjwt-impl:0.11.2")
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.2")
