@@ -11,14 +11,15 @@ data class Waiting(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
-    val userId: Int = 0,
-    val phoneNumber: String? = null,
+    var userId: Int? = 0,
+    var phoneNumber: String? = null,
+    val entryCode: String,
     val shopId: Int = 0,
     val orderNo: Int = 0,
-    val headCount: Int = 1,
+    var headCount: Int? = 1,
     var callCount: Int = 0,
     @Enumerated(value = EnumType.STRING)
-    var status: EntryStatus = EntryStatus.WAIT,
+    var status: EntryStatus = EntryStatus.DEFAULT,
     var enteredAt: LocalDateTime? = null,
     var canceledAt: LocalDateTime? = null,
 ) : BaseEntity() {
@@ -31,5 +32,12 @@ data class Waiting(
         this.status = EntryStatus.CANCELED
         canceledAt = LocalDateTime.now()
 
+    }
+
+    fun update(userId: Int?, phoneNumber: String?, headCount: Int?) {
+        userId?.let { this.userId = it }
+        phoneNumber?.let { this.phoneNumber = it }
+        headCount?.let { this.headCount = it }
+        this.status = EntryStatus.WAIT
     }
 }

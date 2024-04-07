@@ -27,4 +27,8 @@ interface WaitingRepository : CrudRepository<Waiting, Int> {
     fun findByShopIdAndUserId(shopId: Int, userId: Int): Waiting?
 
     fun findByShopIdAndPhoneNumber(shopId: Int, phoneNumber: String): Waiting?
+
+    fun findTop1ByShopIdOrderByIdDesc(shopId: Int): Waiting?
+
+    fun findByShopIdAndEntryCode(shopId: Int, entryCode: String): Waiting?
 }

@@ -77,4 +77,11 @@ class WaitingController(
         @RequestBody
         request: CancelWaitingRequest
     ): Boolean = waitingService.cancelWaiting(loginUser.id, shopId, request)
+
+    @GetMapping("/code/{shopId}")
+    fun createCode(
+        @Parameter(name = "shopId", description = "팝업 ID", `in` = ParameterIn.PATH)
+        @PathVariable
+        shopId: Int
+    ): String = waitingService.createCode(shopId)
 }
