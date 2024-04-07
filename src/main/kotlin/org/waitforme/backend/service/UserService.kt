@@ -2,6 +2,7 @@ package org.waitforme.backend.service
 
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.waitforme.backend.enums.FileType
 import org.waitforme.backend.model.request.user.UserInfoRequest
 import org.waitforme.backend.model.response.user.UserInfoResponse
 import org.waitforme.backend.model.response.user.toUserInfoResponse
@@ -26,7 +27,7 @@ class UserService(
             name = request.name
             birthedAt = request.birthedAt ?: birthedAt
             gender = request.gender ?: gender
-            profileImage = request.profileImage?.let { imageUtil.uploadFile(it) }
+            profileImage = request.profileImage?.let { imageUtil.uploadFile(file = it, fileType = FileType.PROFILE) }
         }?.run {
             userRepository.save(this)
         }?.toUserInfoResponse() ?: throw InvalidParameterException("해당 유저에 대한 정보를 찾을 수 없습니다.")
