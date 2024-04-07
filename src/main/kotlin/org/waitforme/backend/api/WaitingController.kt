@@ -1,6 +1,5 @@
 package org.waitforme.backend.api
 
-import io.swagger.v3.oas.annotations.Hidden
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -20,7 +19,6 @@ import org.waitforme.backend.model.request.wait.CancelWaitingRequest
 import org.waitforme.backend.model.response.wait.WaitingOwnerResponse
 import org.waitforme.backend.model.response.wait.WaitingResponse
 import org.waitforme.backend.service.WaitingService
-import kotlin.math.log
 
 @RestController
 @Tag(name = "대기 관련 API")
