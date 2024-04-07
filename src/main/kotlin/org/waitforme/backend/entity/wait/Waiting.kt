@@ -5,7 +5,7 @@ import org.waitforme.backend.enums.EntryStatus
 import java.time.LocalDateTime
 import javax.persistence.*
 
-@Table(name = "shop")
+@Table(name = "waiting")
 @Entity
 data class Waiting(
     @Id
@@ -19,10 +19,17 @@ data class Waiting(
     var callCount: Int = 0,
     @Enumerated(value = EnumType.STRING)
     var status: EntryStatus = EntryStatus.WAIT,
-    var enteredAt: LocalDateTime? = null
+    var enteredAt: LocalDateTime? = null,
+    var canceledAt: LocalDateTime? = null,
 ) : BaseEntity() {
     fun updateStatus(status: EntryStatus) {
         this.status = status
         enteredAt = LocalDateTime.now()
+    }
+
+    fun cancel() {
+        this.status = EntryStatus.CANCELED
+        canceledAt = LocalDateTime.now()
+
     }
 }

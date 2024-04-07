@@ -24,4 +24,8 @@ interface WaitingRepository : CrudRepository<Waiting, Int> {
     fun findByUserId(userId: Int, limit: Int, start: Long): List<WaitingListResult>
 
     fun countByUserId(userId: Int): Long
+
+    fun findByShopIdAndUserId(shopId: Int, userId: Int): Waiting?
+
+    fun findByShopIdAndPhoneNumber(shopId: Int, phoneNumber: String): Waiting?
 }

@@ -5,11 +5,14 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.waitforme.backend.entity.wait.Waiting
+import org.waitforme.backend.enums.EntryStatus
 import org.waitforme.backend.model.request.wait.AddEntryRequest
+import org.waitforme.backend.model.request.wait.CancelWaitingRequest
 import org.waitforme.backend.model.response.wait.WaitingOwnerResponse
 import org.waitforme.backend.model.response.wait.WaitingResponse
 import org.waitforme.backend.model.response.wait.toResponse
 import org.waitforme.backend.repository.wait.WaitingRepository
+import org.webjars.NotFoundException
 import java.security.InvalidParameterException
 import java.util.regex.Pattern
 
@@ -33,10 +36,10 @@ class WaitingService(
         return PageImpl(waitingList, pageRequest, count)
     }
 
-    fun addEntry(shopId: Int, request: AddEntryRequest): Int {
+    fun addEntry(shopId: Int, userId: Int?, request: AddEntryRequest): Int {
         val orderNo = waitingRepository.findOrderNoTop1(shopId)
 
-        val waiting = request.userId?.let {
+        val waiting = userId?.let {
             Waiting(
                 userId = it,
                 shopId = shopId,
@@ -57,6 +60,17 @@ class WaitingService(
     }
 
     fun getRemainCount(shopId: Int): Int = waitingRepository.countWaitingList(shopId).toInt()
+
+    fun cancelWaiting(userId: Int?, shopId: Int, request: CancelWaitingRequest): Boolean {
+        val waiting = userId?.let {
+            waitingRepository.findByShopIdAndUserId(shopId, it)
+        } ?: run {
+            waitingRepository.findByShopIdAndPhoneNumber(shopId, request.phoneNumber)
+        } ?: throw NotFoundException("해당 대기 정보를 찾을 수 없습니다.")
+
+        waiting.cancel()
+        return (waitingRepository.save(waiting).status == EntryStatus.CANCELED)
+    }
 
     private fun validatePhoneNumber(phoneNum: String) {
         val regex = "^\\s*(010|011|012|013|014|015|016|017|018|019)(-|\\)|\\s)*(\\d{3,4})(-|\\s)*(\\d{4})\\s*$";
