@@ -13,6 +13,7 @@ import org.waitforme.backend.model.response.wait.WaitingResponse
 import org.waitforme.backend.model.response.wait.toResponse
 import org.waitforme.backend.repository.wait.WaitingRepository
 import org.webjars.NotFoundException
+import java.security.InvalidKeyException
 import java.security.InvalidParameterException
 import java.util.regex.Pattern
 
@@ -40,6 +41,10 @@ class WaitingService(
     fun addEntry(shopId: Int, userId: Int?, request: AddEntryRequest): Int {
         val waiting = waitingRepository.findByShopIdAndEntryCode(shopId, request.entryCode)
             ?: throw NotFoundException("코드를 찾을 수 없습니다.")
+
+        if (waiting.status != EntryStatus.DEFAULT) {
+            throw InvalidKeyException("올바르지 않은 코드값입니다.")
+        }
 
         waiting.update(
             userId = userId,
@@ -76,6 +81,7 @@ class WaitingService(
                 entryCode = randomCode,
                 orderNo = (waiting?.orderNo ?: 0) + 1
             )
+            waitingRepository.save(waiting)
         }
 
         return waiting.entryCode

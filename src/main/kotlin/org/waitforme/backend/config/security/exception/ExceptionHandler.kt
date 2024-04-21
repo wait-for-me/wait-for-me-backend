@@ -1,5 +1,7 @@
 package org.waitforme.backend.config.security.exception
 
+import io.jsonwebtoken.security.InvalidKeyException
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -13,6 +15,17 @@ class ExceptionHandler {
                 BaseRes(
                     e.baseResponseCode.status,
                     e.baseResponseCode.message
+                )
+            )
+    }
+
+    @ExceptionHandler(InvalidKeyException::class)
+    fun handlerInvalidKeyException(e: InvalidKeyException): ResponseEntity<BaseRes> {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(
+                BaseRes(
+                    HttpStatus.BAD_REQUEST,
+                    e.message!!
                 )
             )
     }
