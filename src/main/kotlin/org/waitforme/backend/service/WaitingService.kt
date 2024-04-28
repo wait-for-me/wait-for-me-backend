@@ -64,7 +64,7 @@ class WaitingService(
     fun getRemainCount(shopId: Int): Int = waitingRepository.countWaitingList(shopId).toInt()
 
     fun changeEntryStatusOwner(request: ChangeEntryStatusRequest): WaitingStatusResponse {
-        val result = waitingRepository.findStatusByUserId(userId = request.userId, shopId = request.shopId)?.let { waitingUser ->
+        val result = waitingRepository.findStatusByPhoneNumberAndShopId(phoneNumber = request.phoneNumber, shopId = request.shopId)?.let { waitingUser ->
 
             // 각 상태에 따른 PUSH 요청
             when (waitingUser.status) {

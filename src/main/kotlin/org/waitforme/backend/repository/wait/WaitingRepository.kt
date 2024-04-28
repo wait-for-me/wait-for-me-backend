@@ -24,5 +24,5 @@ interface WaitingRepository : CrudRepository<Waiting, Int> {
 
     fun countByUserId(userId: Int): Long
 
-    fun findStatusByUserId(userId: Int, shopId: Int): Waiting?
+    fun findStatusByPhoneNumberAndShopId(phoneNumber: String, shopId: Int): Waiting?
 }
