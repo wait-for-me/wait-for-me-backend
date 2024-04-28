@@ -1,6 +1,5 @@
 package org.waitforme.backend.repository.wait
 
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
@@ -24,4 +23,6 @@ interface WaitingRepository : CrudRepository<Waiting, Int> {
     fun findByUserId(userId: Int, limit: Int, start: Long): List<WaitingListResult>
 
     fun countByUserId(userId: Int): Long
+
+    fun findStatusByUserId(userId: Int, shopId: Int): Waiting?
 }

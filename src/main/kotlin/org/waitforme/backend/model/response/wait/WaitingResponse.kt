@@ -10,7 +10,7 @@ data class WaitingResponse(
     val entryStatus: EntryStatus,
     val createdAt: LocalDateTime,
     val orderNo: Int,
-    val headCount: Int
+    val headCount: Int,
 )
 
 fun WaitingListResult.toResponse() = WaitingResponse(
@@ -19,5 +19,5 @@ fun WaitingListResult.toResponse() = WaitingResponse(
     entryStatus = status,
     createdAt = createdAt,
     orderNo = orderNo,
-    headCount = headCount
+    headCount = headCount,
 )

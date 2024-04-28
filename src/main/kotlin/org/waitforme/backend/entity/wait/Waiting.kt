@@ -25,4 +25,8 @@ data class Waiting(
         this.status = status
         enteredAt = LocalDateTime.now()
     }
+
+    fun getWaitingUpdatedAt(): LocalDateTime {
+        return updatedAt
+    }
 }

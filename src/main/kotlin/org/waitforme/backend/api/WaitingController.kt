@@ -1,25 +1,24 @@
 package org.waitforme.backend.api
 
+import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.waitforme.backend.model.request.wait.AddEntryRequest
+import org.waitforme.backend.model.request.wait.ChangeEntryStatusRequest
 import org.waitforme.backend.model.response.wait.WaitingOwnerResponse
 import org.waitforme.backend.model.response.wait.WaitingResponse
+import org.waitforme.backend.model.response.wait.WaitingStatusResponse
 import org.waitforme.backend.service.WaitingService
 
 @RestController
 @Tag(name = "대기 관련 API")
 @RequestMapping("/v1/waiting")
 class WaitingController(
-    private val waitingService: WaitingService
+    private val waitingService: WaitingService,
 ) {
     @GetMapping("/owner/{shopId}")
     fun getWaitingListOwner(
@@ -51,13 +50,20 @@ class WaitingController(
     fun addEntry(
         @PathVariable
         shopId: Int,
-        request: AddEntryRequest
+        request: AddEntryRequest,
     ): Int = waitingService.addEntry(shopId, request)
 
     @GetMapping("remain/{shopId}")
     fun getRemainCount(
         @Parameter(name = "shopId", description = "팝업 ID", `in` = ParameterIn.PATH)
         @PathVariable
-        shopId: Int
+        shopId: Int,
     ): Int = waitingService.getRemainCount(shopId)
+
+    @Operation(summary = "점주의 대기 유저 상태 변경 API", description = "대기 중인 유저의 상태를 변경합니다.")
+    @PutMapping("/change/status")
+    fun changeEntryStatusOwner(
+        // TODO : LoginOwner 추가?
+        request: ChangeEntryStatusRequest,
+    ): WaitingStatusResponse = waitingService.changeEntryStatusOwner(request = request)
 }
