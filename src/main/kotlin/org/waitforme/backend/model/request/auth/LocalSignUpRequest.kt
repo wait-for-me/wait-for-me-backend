@@ -9,20 +9,18 @@ import javax.validation.constraints.Pattern
 data class LocalSignUpRequest(
     @field:Pattern(regexp = "010[0-9]{3,4}[0-9]{4}")
     val phoneNumber: String,
-    @NotBlank
-    @field:Pattern(regexp = "^[a-zA-Z0-9]{1,8}\$")
-    val name: String,
+    val name: String? = null,
     @NotBlank
     @field:Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[\$@\$!%*#?&])[A-Za-z\\d\$@\$!%*#?&]{8,}\$")
     val password: String,
     val isOwner: Boolean
 )
 
-fun LocalSignUpRequest.toUserEntity(encoder: PasswordEncoder, isAuth: Boolean) = User(
+fun LocalSignUpRequest.toUserEntity(encoder: PasswordEncoder, isAuth: Boolean, userName: String) = User(
     provider = Provider.LOCAL,
     phoneNumber = phoneNumber,
     password = encoder.encode(password),
-    name = name,
+    name = userName,
     isOwner = isOwner,
     isAuth = isAuth,
 )
