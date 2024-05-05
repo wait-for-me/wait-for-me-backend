@@ -59,6 +59,9 @@ dependencies {
     // health-check
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
+    // firebase
+    implementation("com.squareup.okhttp3:okhttp:4.2.2")
+    implementation("com.google.firebase:firebase-admin:9.2.0")
 }
 
 tasks.withType<KotlinCompile> {

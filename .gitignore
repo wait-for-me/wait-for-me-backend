@@ -28,6 +28,7 @@ out/
 
 ### local-config
 src/main/resources/application-local.yml
+src/main/resources/firebase_service_key.json
 
 ### NetBeans ###
 /nbproject/private/
