@@ -63,7 +63,6 @@ class WaitingController(
     @Operation(summary = "점주의 대기 유저 상태 변경 API", description = "대기 중인 유저의 상태를 변경합니다.")
     @PutMapping("/change/status")
     fun changeEntryStatusOwner(
-        // TODO : LoginOwner 추가?
         request: ChangeEntryStatusRequest,
     ): WaitingStatusResponse = waitingService.changeEntryStatusOwner(request = request)
 }

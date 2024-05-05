@@ -12,6 +12,7 @@ import org.waitforme.backend.model.response.wait.WaitingOwnerResponse
 import org.waitforme.backend.model.response.wait.WaitingResponse
 import org.waitforme.backend.model.response.wait.WaitingStatusResponse
 import org.waitforme.backend.model.response.wait.toResponse
+import org.waitforme.backend.repository.shop.ShopRepository
 import org.waitforme.backend.repository.wait.WaitingRepository
 import java.security.InvalidParameterException
 import java.time.LocalDateTime
@@ -20,6 +21,8 @@ import java.util.regex.Pattern
 @Service
 class WaitingService(
     private val waitingRepository: WaitingRepository,
+    private val userPushService: UserPushService,
+    private val shopRepository: ShopRepository,
 ) {
     fun getWaitingListOwner(userId: Int, shopId: Int, pageRequest: PageRequest): Page<WaitingOwnerResponse> {
         // TODO: userId로 관리자 여부 판별 로직 추가하기
@@ -64,14 +67,26 @@ class WaitingService(
     fun getRemainCount(shopId: Int): Int = waitingRepository.countWaitingList(shopId).toInt()
 
     fun changeEntryStatusOwner(request: ChangeEntryStatusRequest): WaitingStatusResponse {
-        val result = waitingRepository.findStatusByPhoneNumberAndShopId(phoneNumber = request.phoneNumber, shopId = request.shopId)?.let { waitingUser ->
+        val result = waitingRepository.findStatusByPhoneNumberAndShopId(
+            phoneNumber = request.phoneNumber,
+            shopId = request.shopId,
+        )?.let { waitingUser ->
+
+            // 가게 정보 Get
+            val shopInfo = shopRepository.findByIdAndIsShow(id = request.shopId)
+                ?: throw InvalidParameterException("찾을 수 없는 가게 정보입니다.")
 
             // 각 상태에 따른 PUSH 요청
             when (waitingUser.status) {
                 EntryStatus.WAIT -> {
                     when (request.entryStatus) {
                         EntryStatus.CALL -> {
-                            // TODO : 앱 푸시 발송
+                            sendMessageByStatus(
+                                status = EntryStatus.CALL,
+                                userId = waitingUser.userId,
+                                shopName = shopInfo.name,
+                            )
+
                             waitingRepository.save(
                                 waitingUser.apply {
                                     status = EntryStatus.CALL
@@ -81,6 +96,12 @@ class WaitingService(
                         }
 
                         EntryStatus.NO_SHOW -> {
+                            sendMessageByStatus(
+                                status = EntryStatus.NO_SHOW,
+                                userId = waitingUser.userId,
+                                shopName = shopInfo.name,
+                            )
+
                             waitingRepository.save(
                                 waitingUser.apply {
                                     // callCount = 0이어도 상관없이 노쇼 처리 가능
@@ -96,7 +117,12 @@ class WaitingService(
                 EntryStatus.CALL -> {
                     when (request.entryStatus) {
                         EntryStatus.CALL -> {
-                            // TODO : 앱 푸시 발송
+                            sendMessageByStatus(
+                                status = EntryStatus.CALL,
+                                userId = waitingUser.userId,
+                                shopName = shopInfo.name,
+                            )
+
                             waitingRepository.save(
                                 waitingUser.apply {
                                     callCount = callCount++
@@ -105,6 +131,12 @@ class WaitingService(
                         }
 
                         EntryStatus.ENTRY -> {
+                            sendMessageByStatus(
+                                status = EntryStatus.ENTRY,
+                                userId = waitingUser.userId,
+                                shopName = shopInfo.name,
+                            )
+
                             waitingRepository.save(
                                 waitingUser.apply {
                                     status = EntryStatus.ENTRY
@@ -114,6 +146,12 @@ class WaitingService(
                         }
 
                         EntryStatus.NO_SHOW -> {
+                            sendMessageByStatus(
+                                status = EntryStatus.NO_SHOW,
+                                userId = waitingUser.userId,
+                                shopName = shopInfo.name,
+                            )
+
                             waitingRepository.save(
                                 waitingUser.apply {
                                     status = EntryStatus.NO_SHOW
@@ -131,6 +169,12 @@ class WaitingService(
 
                 EntryStatus.NO_SHOW -> {
                     if (request.entryStatus == EntryStatus.WAIT) {
+                        sendMessageByStatus(
+                            status = EntryStatus.WAIT,
+                            userId = waitingUser.userId,
+                            shopName = shopInfo.name,
+                        )
+
                         // TODO : 최하단으로 안해도 X / 그대로 돌아오기 → 정렬에 대해서는 한번 더 로직 보고 검토해서 정하기
                         waitingRepository.save(
                             waitingUser.apply {
@@ -155,5 +199,54 @@ class WaitingService(
         val m = p.matcher(phoneNum)
 
         if (!m.matches()) throw InvalidParameterException("유효한 휴대폰 번호가 아닙니다.")
+    }
+
+    private fun sendUserPush(userId: Int, title: String, body: String) {
+        userPushService.sendPushMessage(
+            targetToken = userPushService.getUserPushToken(userId)?.pushToken
+                ?: throw InvalidParameterException("해당 유저에게 PUSH를 보낼 수 없습니다."),
+            title = title,
+            body = body,
+        )
+    }
+
+    private fun sendMessageByStatus(userId: Int, shopName: String, status: EntryStatus) {
+        when (status) {
+            EntryStatus.CALL -> {
+                sendUserPush(
+                    userId = userId,
+                    title = "[Wait-For-Me] 입장 안내",
+                    body = "$shopName 에서 고객님을 기다리고 있어요! 지금 입장해주세요!",
+                )
+            }
+
+            EntryStatus.NO_SHOW -> {
+                sendUserPush(
+                    userId = userId,
+                    title = "[Wait-For-Me] 노쇼 안내",
+                    body = "$shopName 에서 고객님을 노쇼 처리했음을 알려드립니다.",
+                )
+            }
+
+            EntryStatus.ENTRY -> {
+                sendUserPush(
+                    userId = userId,
+                    title = "[Wait-For-Me] 입장 완료 안내",
+                    body = "$shopName 입장을 완료했어요! 즐거운 시간 되시길 바래요!",
+                )
+            }
+
+            EntryStatus.WAIT -> {
+                sendUserPush(
+                    userId = userId,
+                    title = "[Wait-For-Me] 대기 신청 안내",
+                    body = "$shopName 현장 대기를 신청했어요! 조금만 기다려주세요! ",
+                )
+            }
+
+            else -> {
+                throw InvalidParameterException("PUSH 메시지 전송에 실패하였습니다. (status : $status)")
+            }
+        }
     }
 }
