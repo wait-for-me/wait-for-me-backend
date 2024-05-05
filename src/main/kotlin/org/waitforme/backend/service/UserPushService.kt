@@ -15,13 +15,11 @@ class UserPushService(
 ) {
 
     fun registerUserPushToken(request: UserPushTokenRequest) {
+        // 조회해서 있을 경우 Update, 없으면 insert
         val userPush =
-            userRepository.findByPhoneNumber(phoneNumber = request.phoneNumber)?.let { user ->
-                // userId가 있으면 조회해서 있을 경우 Update, 없으면 insert
-                userPushRepository.findByUserId(userId = user.id)?.let {
-                    request.toEntity(id = it.id, userId = user.id)
-                } ?: request.toEntity(userId = user.id)
-            } ?: request.toEntity() // 비회원의 경우
+            userPushRepository.findByPhoneNumber(phoneNumber = request.phoneNumber)?.let {
+                request.toEntity(id = it.id)
+            } ?: request.toEntity()
 
         userPushRepository.save(userPush)
     }
@@ -34,7 +32,7 @@ class UserPushService(
         )
     }
 
-    fun getUserPushToken(userId: Int): UserPush? {
-        return userPushRepository.findByUserId(userId)
+    fun getUserPushToken(phoneNum: String): UserPush? {
+        return userPushRepository.findByPhoneNumber(phoneNum)
     }
 }

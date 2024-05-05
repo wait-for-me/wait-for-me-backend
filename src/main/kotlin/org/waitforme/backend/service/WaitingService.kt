@@ -83,7 +83,7 @@ class WaitingService(
                         EntryStatus.CALL -> {
                             sendMessageByStatus(
                                 status = EntryStatus.CALL,
-                                userId = waitingUser.userId,
+                                phoneNum = waitingUser.phoneNumber!!,
                                 shopName = shopInfo.name,
                             )
 
@@ -98,7 +98,7 @@ class WaitingService(
                         EntryStatus.NO_SHOW -> {
                             sendMessageByStatus(
                                 status = EntryStatus.NO_SHOW,
-                                userId = waitingUser.userId,
+                                phoneNum = waitingUser.phoneNumber!!,
                                 shopName = shopInfo.name,
                             )
 
@@ -119,7 +119,7 @@ class WaitingService(
                         EntryStatus.CALL -> {
                             sendMessageByStatus(
                                 status = EntryStatus.CALL,
-                                userId = waitingUser.userId,
+                                phoneNum = waitingUser.phoneNumber!!,
                                 shopName = shopInfo.name,
                             )
 
@@ -133,7 +133,7 @@ class WaitingService(
                         EntryStatus.ENTRY -> {
                             sendMessageByStatus(
                                 status = EntryStatus.ENTRY,
-                                userId = waitingUser.userId,
+                                phoneNum = waitingUser.phoneNumber!!,
                                 shopName = shopInfo.name,
                             )
 
@@ -148,7 +148,7 @@ class WaitingService(
                         EntryStatus.NO_SHOW -> {
                             sendMessageByStatus(
                                 status = EntryStatus.NO_SHOW,
-                                userId = waitingUser.userId,
+                                phoneNum = waitingUser.phoneNumber!!,
                                 shopName = shopInfo.name,
                             )
 
@@ -171,7 +171,7 @@ class WaitingService(
                     if (request.entryStatus == EntryStatus.WAIT) {
                         sendMessageByStatus(
                             status = EntryStatus.WAIT,
-                            userId = waitingUser.userId,
+                            phoneNum = waitingUser.phoneNumber!!,
                             shopName = shopInfo.name,
                         )
 
@@ -201,20 +201,20 @@ class WaitingService(
         if (!m.matches()) throw InvalidParameterException("유효한 휴대폰 번호가 아닙니다.")
     }
 
-    private fun sendUserPush(userId: Int, title: String, body: String) {
+    private fun sendUserPush(phoneNum: String, title: String, body: String) {
         userPushService.sendPushMessage(
-            targetToken = userPushService.getUserPushToken(userId)?.pushToken
+            targetToken = userPushService.getUserPushToken(phoneNum)?.pushToken
                 ?: throw InvalidParameterException("해당 유저에게 PUSH를 보낼 수 없습니다."),
             title = title,
             body = body,
         )
     }
 
-    private fun sendMessageByStatus(userId: Int, shopName: String, status: EntryStatus) {
+    private fun sendMessageByStatus(phoneNum: String, shopName: String, status: EntryStatus) {
         when (status) {
             EntryStatus.CALL -> {
                 sendUserPush(
-                    userId = userId,
+                    phoneNum = phoneNum,
                     title = "[Wait-For-Me] 입장 안내",
                     body = "$shopName 에서 고객님을 기다리고 있어요! 지금 입장해주세요!",
                 )
@@ -222,7 +222,7 @@ class WaitingService(
 
             EntryStatus.NO_SHOW -> {
                 sendUserPush(
-                    userId = userId,
+                    phoneNum = phoneNum,
                     title = "[Wait-For-Me] 노쇼 안내",
                     body = "$shopName 에서 고객님을 노쇼 처리했음을 알려드립니다.",
                 )
@@ -230,7 +230,7 @@ class WaitingService(
 
             EntryStatus.ENTRY -> {
                 sendUserPush(
-                    userId = userId,
+                    phoneNum = phoneNum,
                     title = "[Wait-For-Me] 입장 완료 안내",
                     body = "$shopName 입장을 완료했어요! 즐거운 시간 되시길 바래요!",
                 )
@@ -238,7 +238,7 @@ class WaitingService(
 
             EntryStatus.WAIT -> {
                 sendUserPush(
-                    userId = userId,
+                    phoneNum = phoneNum,
                     title = "[Wait-For-Me] 대기 신청 안내",
                     body = "$shopName 현장 대기를 신청했어요! 조금만 기다려주세요! ",
                 )

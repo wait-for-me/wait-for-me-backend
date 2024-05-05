@@ -5,5 +5,5 @@ import org.waitforme.backend.entity.user.UserPush
 
 interface UserPushRepository : CrudRepository<UserPush, Int> {
 
-    fun findByUserId(userId: Int): UserPush?
+    fun findByPhoneNumber(phoneNumber: String): UserPush?
 }

@@ -8,9 +8,8 @@ data class UserPushTokenRequest(
     val deviceId: String,
 )
 
-fun UserPushTokenRequest.toEntity(id: Int? = 0, userId: Int? = 0) = UserPush(
+fun UserPushTokenRequest.toEntity(id: Int? = 0) = UserPush(
     id = id ?: 0,
-    userId = userId,
     phoneNumber = phoneNumber,
     pushToken = pushToken,
     deviceId = deviceId,
