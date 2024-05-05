@@ -9,7 +9,8 @@ data class UserPush(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
-    val userId: Int,
+    val userId: Int? = 0,
+    val phoneNumber: String,
     val pushToken: String,
     val deviceId: String,
 ) : BaseEntity()
