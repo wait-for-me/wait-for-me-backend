@@ -41,8 +41,8 @@ cloud:
     s3:
       bucket: dev-wait-for-me
     credentials:
-      access-key: ${aws.access.key:access-key}
-      secret-key: ${aws.secret.key:secret-key}
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
 sms:
   fromNumber: 01012345678
   apiKey: api-key
