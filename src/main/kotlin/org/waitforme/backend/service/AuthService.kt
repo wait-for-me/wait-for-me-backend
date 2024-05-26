@@ -239,7 +239,6 @@ class AuthService(
 
     @Transactional
     fun signInSns(request: SnsSignInRequest): AuthResponse {
-        // TODO : 확인 필요
         val user = userRepository.findByProviderAndSnsId(
             provider = request.provider,
             snsId = request.snsId,

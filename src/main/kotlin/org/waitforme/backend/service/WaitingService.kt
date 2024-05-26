@@ -175,7 +175,7 @@ class WaitingService(
                             shopName = shopInfo.name,
                         )
 
-                        // TODO : 최하단으로 안해도 X / 그대로 돌아오기 → 정렬에 대해서는 한번 더 로직 보고 검토해서 정하기
+                        // 순서 - 최하단으로 X / 순서 그대로 돌아오기
                         waitingRepository.save(
                             waitingUser.apply {
                                 status = EntryStatus.WAIT

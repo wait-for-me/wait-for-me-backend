@@ -10,7 +10,7 @@ data class WaitingStatusResponse(
     val entryStatus: EntryStatus,
     val orderNo: Int,
     val callCount: Int,
-    val updatedAt: LocalDateTime, // TODO : 상태 변경이 반영된 시각을 뭘로 보여줄 것인지? -> updatedAt
+    val updatedAt: LocalDateTime, // 상태 변경이 반영된 시각은 updatedAt으로 참고
 )
 
 fun Waiting.toResponse() = WaitingStatusResponse(
