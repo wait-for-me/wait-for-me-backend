@@ -48,7 +48,11 @@ data class User(
     }
 
     override fun getPassword(): String? {
-        return password // TODO: null이어도 되나..? 확인 필요
+        return password
+    }
+
+    fun updatePassword(newPassword: String) {
+        this.password = newPassword
     }
 
     override fun getUsername(): String {

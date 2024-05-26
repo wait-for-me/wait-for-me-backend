@@ -28,6 +28,7 @@ class UserService(
             birthedAt = request.birthedAt ?: birthedAt
             gender = request.gender ?: gender
             profileImage = request.profileImage?.let { imageUtil.uploadFile(file = it, fileType = FileType.PROFILE) }
+            request.password?.let { updatePassword(newPassword = request.password) }
         }?.run {
             userRepository.save(this)
         }?.toUserInfoResponse() ?: throw InvalidParameterException("해당 유저에 대한 정보를 찾을 수 없습니다.")
