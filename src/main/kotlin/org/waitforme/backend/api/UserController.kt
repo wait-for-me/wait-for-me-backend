@@ -8,6 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.waitforme.backend.model.LoginUser
 import org.waitforme.backend.model.request.user.UserInfoRequest
+import org.waitforme.backend.model.request.user.UserWithdrawRequest
 import org.waitforme.backend.model.response.user.UserInfoResponse
 import org.waitforme.backend.service.UserService
 
@@ -33,4 +34,11 @@ class UserController(
         @Parameter(hidden = true) @AuthenticationPrincipal loginUser: LoginUser,
         @RequestBody userInfoRequest: UserInfoRequest,
     ): UserInfoResponse = userService.saveUserInfo(userId = loginUser.id, request = userInfoRequest)
+
+    @Operation(summary = "회원 탈퇴", description = "회원 정보를 수정합니다.")
+    @DeleteMapping("/withdraw")
+    fun withdrawUser(
+        @Parameter(hidden = true) @AuthenticationPrincipal loginUser: LoginUser,
+        @RequestBody userWithdrawRequest: UserWithdrawRequest,
+    ): Boolean = userService.withdrawUser(userId = loginUser.id, request = userWithdrawRequest)
 }

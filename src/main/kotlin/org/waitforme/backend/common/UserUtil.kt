@@ -1,7 +1,9 @@
 package org.waitforme.backend.common
 
+import org.springframework.stereotype.Component
 import kotlin.random.Random
 
+@Component
 class UserUtil {
 
     // nickname
