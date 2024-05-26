@@ -8,7 +8,7 @@ import org.waitforme.backend.model.dto.wait.WaitingListOwnerResult
 import org.waitforme.backend.model.dto.wait.WaitingListResult
 
 @Repository
-interface WaitingRepository : CrudRepository<Waiting, Int> {
+interface WaitingRepository : CrudRepository<Waiting, Int>, WaitingCustomRepository {
 
     @Query(nativeQuery = true, value = WaitingQuery.findOrderNoTop1)
     fun findOrderNoTop1(shopId: Int): Int

@@ -1,17 +1,25 @@
 package org.waitforme.backend.service
 
+import com.google.gson.Gson
+import com.google.gson.JsonParser
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.waitforme.backend.entity.wait.Waiting
 import org.waitforme.backend.enums.EntryStatus
+import org.waitforme.backend.model.dto.wait.WaitingMembersResult
 import org.waitforme.backend.model.request.wait.AddEntryRequest
 import org.waitforme.backend.model.request.wait.CancelWaitingRequest
+import org.waitforme.backend.model.request.wait.CheckStatusRequest
 import org.waitforme.backend.model.response.wait.WaitingOwnerResponse
 import org.waitforme.backend.model.response.wait.WaitingResponse
 import org.waitforme.backend.model.response.wait.toResponse
 import org.waitforme.backend.repository.wait.WaitingRepository
+import org.waitforme.backend.util.SqsUtil
 import org.webjars.NotFoundException
 import java.security.InvalidKeyException
 import java.security.InvalidParameterException
@@ -19,7 +27,8 @@ import java.util.regex.Pattern
 
 @Service
 class WaitingService(
-    private val waitingRepository: WaitingRepository
+    private val waitingRepository: WaitingRepository,
+    private val sqsUtil: SqsUtil,
 ) {
     fun getWaitingListOwner(userId: Int, shopId: Int, pageRequest: PageRequest): Page<WaitingOwnerResponse> {
         // TODO: userId로 관리자 여부 판별 로직 추가하기
@@ -37,9 +46,20 @@ class WaitingService(
         return PageImpl(waitingList, pageRequest, count)
     }
 
-    // TODO: SQS 붙이기
-    fun addEntry(shopId: Int, userId: Int?, request: AddEntryRequest): Int {
-        val waiting = waitingRepository.findByShopIdAndEntryCode(shopId, request.entryCode)
+    fun addEntry(shopId: Int, userId: Int?, request: AddEntryRequest) {
+        val entryRequest = request.toEntryRequest(shopId, userId)
+
+        // json 화
+        val message = Gson().toJson(entryRequest)
+        sqsUtil.sendMessage(message)
+    }
+
+    @SqsListener("waiting-sqs")
+    fun addEntry(message: String): Int {
+        val request = JsonParser.parseString(message).asJsonObject
+        val shopId = request.get("shopId").asInt
+        val entryCode = request.get("entryCode").asString
+        val waiting = waitingRepository.findByShopIdAndEntryCode(shopId, entryCode)
             ?: throw NotFoundException("코드를 찾을 수 없습니다.")
 
         if (waiting.status != EntryStatus.DEFAULT) {
@@ -47,9 +67,10 @@ class WaitingService(
         }
 
         waiting.update(
-            userId = userId,
-            phoneNumber = request.phoneNumber?.let { validatePhoneNumber(it) },
-            headCount = request.headCount
+            userId = request.get("userId").asInt,
+            phoneNumber = validatePhoneNumber(request.get("phoneNumber").asString),
+            password = request.get("password").asString,
+            headCount = request.get("headCount").asInt
         )
 
         return waitingRepository.save(waiting).orderNo
@@ -68,7 +89,6 @@ class WaitingService(
         return (waitingRepository.save(waiting).status == EntryStatus.CANCELED)
     }
 
-    // TODO: SQS 붙이기
     fun createCode(shopId: Int): String {
         var waiting = waitingRepository.findTop1ByShopIdOrderByIdDesc(shopId)
 
@@ -86,6 +106,10 @@ class WaitingService(
 
         return waiting.entryCode
     }
+
+    fun checkStatus(userId: Int?, shopId: Int, request: CheckStatusRequest) =
+        waitingRepository.countWaitingMembers(userId, shopId, request.password, request.phoneNumber)
+            ?.toResponse() ?: WaitingMembersResult()
 
     private fun validatePhoneNumber(phoneNum: String): String {
         val regex = "^\\s*(010|011|012|013|014|015|016|017|018|019)(-|\\)|\\s)*(\\d{3,4})(-|\\s)*(\\d{4})\\s*$";

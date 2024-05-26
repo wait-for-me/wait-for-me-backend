@@ -13,6 +13,7 @@ data class Waiting(
     val id: Int = 0,
     var userId: Int? = 0,
     var phoneNumber: String? = null,
+    var password: String? = null,
     val entryCode: String,
     val shopId: Int = 0,
     val orderNo: Int = 0,
@@ -34,9 +35,10 @@ data class Waiting(
 
     }
 
-    fun update(userId: Int?, phoneNumber: String?, headCount: Int?) {
+    fun update(userId: Int?, phoneNumber: String?, password: String?, headCount: Int?) {
         userId?.let { this.userId = it }
         phoneNumber?.let { this.phoneNumber = it }
+        password?.let { this.password = it }
         headCount?.let { this.headCount = it }
         this.status = EntryStatus.WAIT
     }

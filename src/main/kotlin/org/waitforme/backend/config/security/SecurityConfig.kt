@@ -38,6 +38,7 @@ class SecurityConfig(
             "/v1/admin/login",
             "/v1/auth/**",
             "/v1/notice/**",
+            "/v1/waiting/**"
         ) + swaggerPatterns
 
     @Bean
