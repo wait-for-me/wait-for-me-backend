@@ -1,6 +1,8 @@
 package org.waitforme.backend.repository.shop
 
 import com.querydsl.core.types.ExpressionUtils
+import com.querydsl.core.types.Order
+import com.querydsl.core.types.OrderSpecifier
 import com.querydsl.core.types.Projections
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.data.domain.Page
@@ -9,6 +11,8 @@ import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 import org.waitforme.backend.entity.shop.QShop
 import org.waitforme.backend.entity.shop.QShopImage
+import org.waitforme.backend.entity.user.QUser
+import org.waitforme.backend.enums.ShopSorter
 import org.waitforme.backend.model.dto.shop.OwnerShopListResultDto
 import org.waitforme.backend.model.dto.shop.ShopListResultDto
 import java.time.LocalDate
@@ -19,14 +23,25 @@ class ShopCustomRepositoryImpl(
 ): ShopCustomRepository {
     private val shop = QShop.shop
     private val shopImage = QShopImage.shopImage
-//    private val user = QUser.user
+    private val user = QUser.user
 
     override fun findShopList(
         title: String?,
         startedAt: LocalDate,
         endedAt: LocalDate,
+        sorter: ShopSorter,
         pageable: Pageable
     ): Page<ShopListResultDto> {
+        val orderList = mutableListOf<OrderSpecifier<*>>()
+        when (sorter) {
+            ShopSorter.NEWEST -> {
+                orderList.add(OrderSpecifier(Order.DESC, shop.startedAt))
+                orderList.add(OrderSpecifier(Order.DESC, shop.endedAt))
+            }
+            ShopSorter.DEADLINE -> {
+                orderList.add(OrderSpecifier(Order.ASC, shop.endedAt))
+            }
+        }
         val content = queryFactory
             .select(
                 Projections.fields(
@@ -45,10 +60,7 @@ class ShopCustomRepositoryImpl(
                 shop.endedAt.lt(endedAt),
                 if (!title.isNullOrEmpty()) shop.name.contains(title) else null
             )
-            .orderBy(
-                shop.startedAt.asc(),
-                shop.endedAt.desc()
-            )
+            .orderBy(*orderList.toTypedArray())
             .limit(pageable.pageSize.toLong())
             .offset(pageable.offset)
             .fetch()
@@ -91,7 +103,7 @@ class ShopCustomRepositoryImpl(
             )
             .from(shop)
             .innerJoin(shopImage).on(shop.id.eq(shopImage.shopId))
-//            .innerJoin(user).on(shop.userId.eq(user.id))
+            .innerJoin(user).on(shop.userId.eq(user.id))
             .where(
                 shop.isDeleted.isFalse,
                 shop.isShow.eq(isShow),
@@ -99,7 +111,7 @@ class ShopCustomRepositoryImpl(
                 shop.endedAt.lt(endedAt),
                 if (!title.isNullOrEmpty()) shop.name.contains(title) else null,
                 shop.userId.eq(userId),
-//                user.isOwner.isTrue
+                user.isOwner.isTrue
             )
             .orderBy(
                 shop.startedAt.asc(),
@@ -113,7 +125,7 @@ class ShopCustomRepositoryImpl(
             .select(shop.count())
             .from(shop)
             .innerJoin(shopImage).on(shop.id.eq(shopImage.shopId))
-//            .innerJoin(user).on(shop.userId.eq(user.id))
+            .innerJoin(user).on(shop.userId.eq(user.id))
             .where(
                 shop.isDeleted.isFalse,
                 shop.isShow.eq(isShow),
@@ -121,7 +133,7 @@ class ShopCustomRepositoryImpl(
                 shop.endedAt.lt(endedAt),
                 if (!title.isNullOrEmpty()) shop.name.contains(title) else null,
                 shop.userId.eq(userId),
-//                user.isOwner.isTrue
+                user.isOwner.isTrue
             )
             .fetchOne() ?: 0
 

@@ -59,6 +59,9 @@ dependencies {
     // health-check
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
+    implementation(group ="org.springframework.cloud", name ="spring-cloud-aws-messaging", version = "2.2.6.RELEASE")
+    implementation(group = "org.springframework.cloud", name = "spring-cloud-aws-autoconfigure", version = "2.2.6.RELEASE")
+    implementation("org.springframework.boot:spring-boot-starter")
 }
 
 tasks.withType<KotlinCompile> {
