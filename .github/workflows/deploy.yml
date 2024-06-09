@@ -13,9 +13,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Set up JDK 11
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
           java-version: '11'
 
@@ -25,15 +27,8 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build
 
-      - name : Make directory
-        run: mkdir -p deploy
-
-      - name : Copy Jar
-        run: cp ./build/libs/*.jar ./deploy
-
       - name : Make zip file
-        run: zip -r ./waitforme.zip ./deploy appspec.yaml ./scripts
-        shell: bash  
+        run: zip -r ./$GITHUB_SHA.zip
 
       - name : Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -48,9 +43,9 @@ jobs:
       - name : Upload to S3
         env:
             S3_BUCKET_NAME: ${{secrets.DEPLOY_S3_BUCKET_NAME}}
-        run : aws s3 cp --region ap-northeast-2 ./waitforme.zip s3://$S3_BUCKET_NAME
+        run : aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip
 
       - name: Code Deploy
         env:
             S3_BUCKET_NAME: ${{secrets.DEPLOY_S3_BUCKET_NAME}}
-        run: aws deploy create-deployment --application-name waitforme --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name waitforme-group --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=waitforme.zip
+        run: aws deploy create-deployment --application-name waitforme --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name waitforme-group --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=$GITHUB_SHA.zip
