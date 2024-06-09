@@ -32,7 +32,7 @@ data class User(
     private var password: String? = null,
     var birthedAt: LocalDate? = null,
     var gender: GenderType? = null,
-    val profileImage: String? = null,
+    var profileImage: String? = null,
     var isOwner: Boolean = false,
     var isAuth: Boolean = false, // 인증 여부, sns로 등록 시 자동 인증, local은 회원 가입 시 인증 절차 필요
     var isAdult: Boolean = false,
@@ -48,7 +48,11 @@ data class User(
     }
 
     override fun getPassword(): String? {
-        return password // TODO: null이어도 되나..? 확인 필요
+        return password
+    }
+
+    fun updatePassword(newPassword: String) {
+        this.password = newPassword
     }
 
     override fun getUsername(): String {

@@ -1,5 +1,6 @@
 package org.waitforme.backend.api
 
+import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -14,11 +15,14 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.waitforme.backend.model.LoginUser
+import org.springframework.web.bind.annotation.*
 import org.waitforme.backend.model.request.wait.AddEntryRequest
 import org.waitforme.backend.model.request.wait.CancelWaitingRequest
 import org.waitforme.backend.model.request.wait.CheckStatusRequest
+import org.waitforme.backend.model.request.wait.ChangeEntryStatusRequest
 import org.waitforme.backend.model.response.wait.WaitingOwnerResponse
 import org.waitforme.backend.model.response.wait.WaitingResponse
+import org.waitforme.backend.model.response.wait.WaitingStatusResponse
 import org.waitforme.backend.service.WaitingService
 import org.waitforme.backend.util.SqsUtil
 
@@ -67,7 +71,7 @@ class WaitingController(
     fun getRemainCount(
         @Parameter(name = "shopId", description = "팝업 ID", `in` = ParameterIn.PATH)
         @PathVariable
-        shopId: Int
+        shopId: Int,
     ): Int = waitingService.getRemainCount(shopId)
 
     @PutMapping("/cancel/{shopId}")
@@ -97,4 +101,10 @@ class WaitingController(
         shopId: Int,
         @RequestBody request: CheckStatusRequest
     ) = waitingService.checkStatus(loginUser?.id, shopId, request)
+
+    @Operation(summary = "점주의 대기 유저 상태 변경 API", description = "대기 중인 유저의 상태를 변경합니다.")
+    @PutMapping("/change/status")
+    fun changeEntryStatusOwner(
+        request: ChangeEntryStatusRequest,
+    ): WaitingStatusResponse = waitingService.changeEntryStatusOwner(request = request)
 }

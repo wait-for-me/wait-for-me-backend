@@ -42,4 +42,8 @@ data class Waiting(
         headCount?.let { this.headCount = it }
         this.status = EntryStatus.WAIT
     }
+
+    fun getWaitingUpdatedAt(): LocalDateTime {
+        return updatedAt
+    }
 }

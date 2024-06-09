@@ -72,3 +72,6 @@ management:
   health:
     diskspace:
       enabled: false
+
+firebase:
+  url: https://fcm.googleapis.com/v1/projects/wait-for-me-411809/messages:send

@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
 import org.waitforme.backend.common.SmsUtil
 import org.waitforme.backend.common.TotpUtil
+import org.waitforme.backend.common.UserUtil
 import org.waitforme.backend.config.security.JwtTokenProvider
 import org.waitforme.backend.entity.user.UserAuth
 import org.waitforme.backend.enums.Provider
@@ -35,6 +36,7 @@ class AuthService(
     private val jwtTokenProvider: JwtTokenProvider,
     private val encoder: PasswordEncoder,
     private val totpUtil: TotpUtil,
+    private val userUtil: UserUtil,
 ) {
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
@@ -120,9 +122,31 @@ class AuthService(
         return userAuthRepository.findByPhoneNumber(phoneNumber = request.phoneNumber)?.let {
             // 이미 인증이 완료되었는지 확인 - 15분 내로 인증을 받은 회원이어야 함
             it.authenticatedAt?.let { userAuthAt ->
+                // 인증 완료 시 회원가입 완료
                 if (Duration.between(userAuthAt, LocalDateTime.now()).toMinutes() < 15) {
-                    // 인증 완료 시 회원가입 완료
-                    val user = userRepository.save(request.toUserEntity(encoder, isAuth = true))
+                    val userName = request.name?.let { requestName ->
+                        // 요청한 이름 정규식 검사
+                        if (!userUtil.checkValidName(requestName)) throw InvalidParameterException("닉네임은 10자 이하의 문자와 숫자로 이루어져야 합니다.")
+                        if (userRepository.existsByName(request.name)) throw InvalidParameterException("이미 존재하는 닉네임입니다.")
+                        requestName
+                    } ?: run {
+                        // null일 경우 랜덤 닉네임 생성
+                        var randomName: String?
+                        while (true) {
+                            randomName = userUtil.generateRandomName()
+                            if (!userRepository.existsByName(randomName)) break
+                        }
+                        randomName
+                    }
+
+                    val user = request.toUserEntity(
+                        encoder = encoder,
+                        isAuth = true,
+                        userName = userName ?: throw InvalidParameterException("UserName이 null입니다"),
+                    ).also {
+                        userRepository.save(it)
+                    }
+
                     val token = jwtTokenProvider.createJwt(
                         id = user.id,
                         account = user.phoneNumber,
@@ -215,7 +239,6 @@ class AuthService(
 
     @Transactional
     fun signInSns(request: SnsSignInRequest): AuthResponse {
-        // TODO : 확인 필요
         val user = userRepository.findByProviderAndSnsId(
             provider = request.provider,
             snsId = request.snsId,

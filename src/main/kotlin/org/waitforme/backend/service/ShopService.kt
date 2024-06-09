@@ -6,6 +6,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.waitforme.backend.entity.shop.ShopImage
+import org.waitforme.backend.enums.FileType
 import org.waitforme.backend.enums.ImageType
 import org.waitforme.backend.enums.ShopSorter
 import org.waitforme.backend.model.request.CreateShopRequest
@@ -80,7 +81,7 @@ class ShopService(
                 ShopImage(
                     shopId = shop.id,
                     imageType = ImageType.DETAIL,
-                    imagePath = imageUtil.uploadFile(it),
+                    imagePath = imageUtil.uploadFile(file = it, fileType = FileType.SHOP),
                     orderNo = orderNo++
                 )
             )
@@ -90,7 +91,7 @@ class ShopService(
             ShopImage(
                 shopId = shop.id,
                 imageType = ImageType.MAIN,
-                imagePath = imageUtil.uploadFile(createShopRequest.mainImage)
+                imagePath = imageUtil.uploadFile(file = createShopRequest.mainImage, fileType = FileType.SHOP )
             )
         )
         val shopImageInfo = shopImageRepository.saveAll(imageList)
@@ -130,7 +131,7 @@ class ShopService(
                     ShopImage(
                         shopId = shop.id,
                         imageType = ImageType.DETAIL,
-                        imagePath = imageUtil.uploadFile(it),
+                        imagePath = imageUtil.uploadFile(file = it, fileType = FileType.SHOP),
                         orderNo = orderNo++
                     )
                 )
@@ -143,7 +144,7 @@ class ShopService(
                 ShopImage(
                     shopId = shop.id,
                     imageType = ImageType.MAIN,
-                    imagePath = imageUtil.uploadFile(it)
+                    imagePath = imageUtil.uploadFile(file = it, fileType = FileType.SHOP)
                 )
             )
         }

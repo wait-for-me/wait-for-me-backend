@@ -6,6 +6,7 @@ import com.amazonaws.util.IOUtils
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
+import org.waitforme.backend.enums.FileType
 import java.io.ByteArrayInputStream
 import java.util.*
 
@@ -16,9 +17,9 @@ class ImageUtil(
     @Value("\${cloud.aws.s3.bucket}")
     lateinit var bucket: String
 
-    fun uploadFile(file: MultipartFile): String {
+    fun uploadFile(file: MultipartFile, fileType: FileType): String {
         val convertInfo = convertFile(file)
-        val fileName = UUID.randomUUID().toString().plus("." + file.name.substringAfterLast("."))
+        val fileName = fileType.prefix + UUID.randomUUID().toString().plus("." + file.name.substringAfterLast("."))
         awsUtil.amazonS3Client().putObject(
             PutObjectRequest(
                 bucket,
