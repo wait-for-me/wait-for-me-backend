@@ -2,8 +2,6 @@ package org.waitforme.backend.service
 
 import com.google.gson.Gson
 import com.google.gson.JsonParser
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -12,11 +10,10 @@ import org.springframework.stereotype.Service
 import org.waitforme.backend.entity.wait.Waiting
 import org.waitforme.backend.enums.EntryStatus
 import org.waitforme.backend.model.dto.wait.WaitingMembersResult
-import org.waitforme.backend.enums.EntryStatus
 import org.waitforme.backend.model.request.wait.AddEntryRequest
 import org.waitforme.backend.model.request.wait.CancelWaitingRequest
-import org.waitforme.backend.model.request.wait.CheckStatusRequest
 import org.waitforme.backend.model.request.wait.ChangeEntryStatusRequest
+import org.waitforme.backend.model.request.wait.CheckStatusRequest
 import org.waitforme.backend.model.response.wait.WaitingOwnerResponse
 import org.waitforme.backend.model.response.wait.WaitingResponse
 import org.waitforme.backend.model.response.wait.WaitingStatusResponse
@@ -39,7 +36,8 @@ class WaitingService(
 ) {
     fun getWaitingListOwner(userId: Int, shopId: Int, pageRequest: PageRequest): Page<WaitingOwnerResponse> {
         // TODO: userId로 관리자 여부 판별 로직 추가하기
-        val waiting = waitingRepository.findWaitingList(shopId, pageRequest.pageSize, pageRequest.offset).map { it.toResponse() }
+        val waiting =
+            waitingRepository.findWaitingList(shopId, pageRequest.pageSize, pageRequest.offset).map { it.toResponse() }
         val count = waitingRepository.countWaitingList(shopId)
 
         return PageImpl(waiting, pageRequest, count)
@@ -77,7 +75,7 @@ class WaitingService(
             userId = request.get("userId").asInt,
             phoneNumber = validatePhoneNumber(request.get("phoneNumber").asString),
             password = request.get("password").asString,
-            headCount = request.get("headCount").asInt
+            headCount = request.get("headCount").asInt,
         )
 
         return waitingRepository.save(waiting).orderNo
@@ -106,7 +104,7 @@ class WaitingService(
             waiting = Waiting(
                 shopId = shopId,
                 entryCode = randomCode,
-                orderNo = (waiting?.orderNo ?: 0) + 1
+                orderNo = (waiting?.orderNo ?: 0) + 1,
             )
             waitingRepository.save(waiting)
         }
@@ -245,7 +243,7 @@ class WaitingService(
         return result.toResponse()
     }
 
-    private fun validatePhoneNumber(phoneNum: String) {
+    private fun validatePhoneNumber(phoneNum: String): String {
         val regex = "^\\s*(010|011|012|013|014|015|016|017|018|019)(-|\\)|\\s)*(\\d{3,4})(-|\\s)*(\\d{4})\\s*$"
         val p = Pattern.compile(regex)
         val m = p.matcher(phoneNum)

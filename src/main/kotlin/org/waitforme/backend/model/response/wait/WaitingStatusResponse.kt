@@ -15,9 +15,9 @@ data class WaitingStatusResponse(
 
 fun Waiting.toResponse() = WaitingStatusResponse(
     shopId = shopId,
-    userId = userId,
+    userId = userId ?: 0,
     entryStatus = status,
     orderNo = orderNo,
     callCount = callCount,
-    updatedAt = getWaitingUpdatedAt()
+    updatedAt = getWaitingUpdatedAt(),
 )
