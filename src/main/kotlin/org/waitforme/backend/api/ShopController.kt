@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
+import org.waitforme.backend.enums.ShopSorter
 import org.waitforme.backend.model.request.CreateShopRequest
 import org.waitforme.backend.model.request.UpdateShopRequest
 import org.waitforme.backend.model.response.shop.FrontShopDetailResponse
@@ -28,12 +29,14 @@ class ShopController(
     fun getShopList(
         @Parameter(name = "title", description = "제목", `in` = ParameterIn.QUERY)
         title: String? = null,
+        @Parameter(name = "sorter", description = "정렬(NEWEST, DEADLINE)", `in` = ParameterIn.QUERY)
+        sorter: ShopSorter? = ShopSorter.NEWEST,
         @Parameter(name = "page", description = "0페이지부터 시작", `in` = ParameterIn.QUERY)
         page: Int? = 0,
         @Parameter(name = "size", description = "1페이지 당 크기", `in` = ParameterIn.QUERY)
         size: Int? = 10,
     ): Page<ShopListResponse> =
-        shopService.getShopList(title, PageRequest.of(page ?: 0, size ?: 10))
+        shopService.getShopList(title, sorter ?: ShopSorter.NEWEST, PageRequest.of(page ?: 0, size ?: 10))
 
     @GetMapping("/{id}")
     fun getShopDetail(
