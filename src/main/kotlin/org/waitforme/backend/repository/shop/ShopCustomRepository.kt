@@ -21,7 +21,7 @@ interface ShopCustomRepository {
         title: String?,
         startedAt: LocalDate,
         endedAt: LocalDate,
-        isShow: Boolean = true,
+        isEnd: Boolean = true,
         pageable: Pageable
     ): Page<OwnerShopListResultDto>
 }

@@ -4,6 +4,7 @@ import com.querydsl.core.types.ExpressionUtils
 import com.querydsl.core.types.Order
 import com.querydsl.core.types.OrderSpecifier
 import com.querydsl.core.types.Projections
+import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -48,7 +49,8 @@ class ShopCustomRepositoryImpl(
                     ShopListResultDto::class.java,
                     shop.id,
                     ExpressionUtils.`as`(shop.name, "title"),
-                    shopImage.imagePath
+                    shopImage.imagePath,
+                    shop.endedAt
                 )
             )
             .from(shop)
@@ -86,7 +88,7 @@ class ShopCustomRepositoryImpl(
         title: String?,
         startedAt: LocalDate,
         endedAt: LocalDate,
-        isShow: Boolean,
+        isEnd: Boolean,
         pageable: Pageable
     ): Page<OwnerShopListResultDto> {
         val content = queryFactory
@@ -106,9 +108,14 @@ class ShopCustomRepositoryImpl(
             .innerJoin(user).on(shop.userId.eq(user.id))
             .where(
                 shop.isDeleted.isFalse,
-                shop.isShow.eq(isShow),
-                shop.startedAt.goe(startedAt),
-                shop.endedAt.lt(endedAt),
+                if (isEnd) {
+                    shop.endedAt.goe(endedAt)
+                        .or(shop.isShow.eq(false))
+                } else {
+                    shop.isShow.isTrue
+                        .and(shop.startedAt.goe(startedAt))
+                        .and(shop.endedAt.lt(endedAt))
+                },
                 if (!title.isNullOrEmpty()) shop.name.contains(title) else null,
                 shop.userId.eq(userId),
                 user.isOwner.isTrue
@@ -128,9 +135,14 @@ class ShopCustomRepositoryImpl(
             .innerJoin(user).on(shop.userId.eq(user.id))
             .where(
                 shop.isDeleted.isFalse,
-                shop.isShow.eq(isShow),
-                shop.startedAt.goe(startedAt),
-                shop.endedAt.lt(endedAt),
+                if (isEnd) {
+                    shop.endedAt.goe(endedAt)
+                        .or(shop.isShow.eq(false))
+                } else {
+                    shop.isShow.isTrue
+                        .and(shop.startedAt.goe(startedAt))
+                        .and(shop.endedAt.lt(endedAt))
+                },
                 if (!title.isNullOrEmpty()) shop.name.contains(title) else null,
                 shop.userId.eq(userId),
                 user.isOwner.isTrue

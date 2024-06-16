@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional
 import org.waitforme.backend.entity.shop.ShopImage
 import org.waitforme.backend.enums.ImageType
 import org.waitforme.backend.enums.ShopSorter
+import org.waitforme.backend.enums.UserRole
+import org.waitforme.backend.model.LoginUser
 import org.waitforme.backend.model.request.CreateShopRequest
 import org.waitforme.backend.model.request.UpdateShopRequest
 import org.waitforme.backend.model.response.shop.*
@@ -45,14 +47,19 @@ class ShopService(
         } ?: throw NotFoundException("팝업을 찾을 수 없습니다.")
     }
 
-    fun getOwnerShopList(userId: Int, title: String?, isShow: Boolean, pageRequest: PageRequest): Page<OwnerShopListResponse> {
+    fun getOwnerShopList(loginUser: LoginUser, title: String?, isEnd: Boolean, pageRequest: PageRequest): Page<OwnerShopListResponse> {
         val now = LocalDate.now()
+        if (loginUser.authorities != UserRole.OWNER.authorities) {
+            throw InvalidParameterException(
+                "점주 (유저)만 사용가능한 기능입니다."
+            )
+        }
         return shopRepository.findOwnerShopList(
-            userId = userId,
+            userId = loginUser.id,
             title = title,
             startedAt = now,
             endedAt = now,
-            isShow = isShow,
+            isEnd = isEnd,
             pageable = pageRequest
         ).map { it.toResponse() }
     }
