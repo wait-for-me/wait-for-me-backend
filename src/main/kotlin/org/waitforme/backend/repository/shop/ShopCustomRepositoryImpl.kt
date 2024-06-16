@@ -5,11 +5,13 @@ import com.querydsl.core.types.Order
 import com.querydsl.core.types.OrderSpecifier
 import com.querydsl.core.types.Projections
 import com.querydsl.core.types.dsl.BooleanExpression
+import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
+import org.waitforme.backend.entity.bookmark.QBookmark
 import org.waitforme.backend.entity.shop.QShop
 import org.waitforme.backend.entity.shop.QShopImage
 import org.waitforme.backend.entity.user.QUser
@@ -25,8 +27,10 @@ class ShopCustomRepositoryImpl(
     private val shop = QShop.shop
     private val shopImage = QShopImage.shopImage
     private val user = QUser.user
+    private val bookmark = QBookmark.bookmark
 
     override fun findShopList(
+        userId: Int?,
         title: String?,
         startedAt: LocalDate,
         endedAt: LocalDate,
@@ -49,12 +53,24 @@ class ShopCustomRepositoryImpl(
                     ShopListResultDto::class.java,
                     shop.id,
                     ExpressionUtils.`as`(shop.name, "title"),
+                    ExpressionUtils.`as`(user.name, "host"),
                     shopImage.imagePath,
-                    shop.endedAt
+                    shop.endedAt,
+                    ExpressionUtils.`as`(
+                        JPAExpressions.select(bookmark.id)
+                        .from(bookmark)
+                        .where(
+                            bookmark.shopId.eq(shop.id),
+                            bookmark.userId.eq(userId ?: 0),
+                            bookmark.isShow.isTrue
+                        ).exists(),
+                        "isFavorite"
+                    )
                 )
             )
             .from(shop)
             .innerJoin(shopImage).on(shop.id.eq(shopImage.shopId))
+            .innerJoin(user).on(shop.userId.eq(user.id))
             .where(
                 shop.isDeleted.isFalse,
                 shop.isShow.isTrue,

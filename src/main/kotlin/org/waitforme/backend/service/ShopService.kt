@@ -28,9 +28,10 @@ class ShopService(
     private val shopImageRepository: ShopImageRepository,
     private val imageUtil: ImageUtil,
 ) {
-    fun getShopList(title: String?, sorter: ShopSorter, pageRequest: PageRequest): Page<ShopListResponse> {
+    fun getShopList(loginUser: LoginUser?, title: String?, sorter: ShopSorter, pageRequest: PageRequest): Page<ShopListResponse> {
         val now = LocalDate.now()
         return shopRepository.findShopList(
+            userId = loginUser?.id,
             title = title,
             startedAt = now,
             endedAt = now,

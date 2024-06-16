@@ -9,6 +9,7 @@ import java.time.LocalDate
 
 interface ShopCustomRepository {
     fun findShopList(
+        userId: Int?,
         title: String?,
         startedAt: LocalDate,
         endedAt: LocalDate,
