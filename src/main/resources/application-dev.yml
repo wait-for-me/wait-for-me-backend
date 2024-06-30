@@ -4,7 +4,8 @@ server:
 spring:
   # env 파일 import
   config:
-    import: optional:file:.env[.properties]
+    import: optional:file:secrets.yml
+
   # H2 Database 설정
   datasource:
     driver-class-name: org.h2.Driver
@@ -44,8 +45,8 @@ cloud:
     s3:
       bucket: dev-wait-for-me
     credentials:
-      access-key: ${CLOUD_AWS_CREDENTIALS_ACCESS_KEY}
-      secret-key: ${CLOUD_AWS_CREDENTIALS_SECRET_KEY}
+      access-key: ${secrets.cloud-aws-credentials-access-key}
+      secret-key: ${secrets.cloud-aws-credentials-secret-key}
 sms:
   fromNumber: 01012345678
   apiKey: api-key
