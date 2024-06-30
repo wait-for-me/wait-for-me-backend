@@ -2,6 +2,9 @@ server:
   port: 8080 # 내장 톰캣 포트번호
 
 spring:
+  # env 파일 import
+  config:
+    import: optional:file:.env[.properties]
   # H2 Database 설정
   datasource:
     driver-class-name: org.h2.Driver
