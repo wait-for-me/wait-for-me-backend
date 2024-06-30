@@ -25,12 +25,6 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build with Gradle
-        env:
-          CLOUD_AWS_CREDENTIALS_ACCESS_KEY: ${{secrets.CLOUD_AWS_CREDENTIALS_ACCESS_KEY}}
-          CLOUD_AWS_CREDENTIALS_SECRET_KEY: ${{secrets.CLOUD_AWS_CREDENTIALS_SECRET_KEY}}
-        run: ./gradlew clean build
-
       - name: create env file
         run: |
           cat << EOF >> .env
@@ -38,6 +32,11 @@ jobs:
           CLOUD_AWS_CREDENTIALS_SECRET_KEY=${{secrets.CLOUD_AWS_CREDENTIALS_SECRET_KEY}}
           EOF
 
+      - name: Build with Gradle
+        env:
+          CLOUD_AWS_CREDENTIALS_ACCESS_KEY: ${{secrets.CLOUD_AWS_CREDENTIALS_ACCESS_KEY}}
+          CLOUD_AWS_CREDENTIALS_SECRET_KEY: ${{secrets.CLOUD_AWS_CREDENTIALS_SECRET_KEY}}
+        run: ./gradlew clean build
       - name : Make zip file
         run: zip -r ./$GITHUB_SHA.zip .
 
