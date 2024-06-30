@@ -28,8 +28,8 @@ jobs:
         run: |
           cat << EOF >> secrets.yml
           secrets:
-            cloud-aws-credentials-access-key:${{secrets.CLOUD_AWS_CREDENTIALS_ACCESS_KEY}}
-            cloud-aws-credentials-secret-key:${{secrets.CLOUD_AWS_CREDENTIALS_SECRET_KEY}}
+            cloud-aws-credentials-access-key: ${{secrets.CLOUD_AWS_CREDENTIALS_ACCESS_KEY}}
+            cloud-aws-credentials-secret-key: ${{secrets.CLOUD_AWS_CREDENTIALS_SECRET_KEY}}
           EOF
 
       - name: Build with Gradle
