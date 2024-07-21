@@ -5,13 +5,11 @@ import org.waitforme.backend.entity.user.UserPush
 import org.waitforme.backend.model.dto.wait.UserPushTokenRequest
 import org.waitforme.backend.model.dto.wait.toEntity
 import org.waitforme.backend.repository.user.UserPushRepository
-import org.waitforme.backend.repository.user.UserRepository
 
 @Service
 class UserPushService(
     private val userPushRepository: UserPushRepository,
     private val firebaseCloudMessageService: FirebaseCloudMessageService,
-    private val userRepository: UserRepository,
 ) {
 
     fun registerUserPushToken(request: UserPushTokenRequest) {
@@ -25,7 +23,7 @@ class UserPushService(
     }
 
     fun sendPushMessage(targetToken: String, title: String, body: String) {
-        firebaseCloudMessageService.sendMessageTo(
+        firebaseCloudMessageService.sendMessage(
             targetToken = targetToken,
             title = title,
             body = body,

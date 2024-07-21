@@ -1,6 +1,5 @@
 package org.waitforme.backend.service
 
-import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.waitforme.backend.entity.admin.AdminHistory
@@ -24,9 +23,8 @@ class NoticeService(
         noticeRepository.findNoticeByIdAndIsDeleted(id = noticeId, isDeleted = false)?.toNoticeResponse()
             ?: throw NotFoundException("공지를 찾을 수 없습니다.")
 
-    fun findNoticeList(pageRequest: PageRequest): List<NoticeListResponse> =
-        noticeRepository.findNoticesByIsDeletedOrderByCreatedAtDesc(isDeleted = false, pageable = pageRequest)
-            .toNoticeListResponse()
+    fun findNoticeList(): List<NoticeListResponse> =
+        noticeRepository.findNoticesByIsDeletedOrderByCreatedAtDesc(isDeleted = false).toNoticeListResponse()
 
     @Transactional
     fun saveNotice(noticeId: Int? = null, request: NoticeRequest, loginAdmin: LoginAdmin): NoticeSaveResponse {

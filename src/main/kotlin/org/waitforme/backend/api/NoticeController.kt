@@ -3,7 +3,6 @@ package org.waitforme.backend.api
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.springframework.data.domain.PageRequest
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
@@ -21,14 +20,10 @@ class NoticeController(
     private val noticeService: NoticeService,
 ) {
 
+    // 공지 리스트 - 페이징 적용 X
     @GetMapping("")
-    fun getNoticeList(
-        @Parameter(name = "page", description = "0페이지부터 시작", `in` = ParameterIn.QUERY)
-        page: Int? = 0,
-        @Parameter(name = "size", description = "1페이지 당 크기", `in` = ParameterIn.QUERY)
-        size: Int? = 10,
-    ): List<NoticeListResponse> =
-        noticeService.findNoticeList(PageRequest.of(page ?: 0, size ?: 10))
+    fun getNoticeList(): List<NoticeListResponse> =
+        noticeService.findNoticeList()
 
     @GetMapping("/{id}")
     fun getNotice(
