@@ -44,10 +44,6 @@ class FirebaseCloudMessageService() {
             )
             .build()
 
-        val result = firebaseMessaging.send(fcmMessage)
-
-        println(result)
-
-        return result
+        return firebaseMessaging.send(fcmMessage)
     }
 }
