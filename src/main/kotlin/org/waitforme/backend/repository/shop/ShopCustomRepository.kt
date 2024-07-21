@@ -9,6 +9,7 @@ import java.time.LocalDate
 
 interface ShopCustomRepository {
     fun findShopList(
+        userId: Int?,
         title: String?,
         startedAt: LocalDate,
         endedAt: LocalDate,
@@ -21,7 +22,7 @@ interface ShopCustomRepository {
         title: String?,
         startedAt: LocalDate,
         endedAt: LocalDate,
-        isShow: Boolean = true,
+        isEnd: Boolean = true,
         pageable: Pageable
     ): Page<OwnerShopListResultDto>
 }

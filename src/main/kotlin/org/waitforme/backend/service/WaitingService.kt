@@ -54,7 +54,14 @@ class WaitingService(
     fun addEntry(shopId: Int, userId: Int?, request: AddEntryRequest) {
         val entryRequest = request.toEntryRequest(shopId, userId)
 
-        // json 화
+        val waiting = waitingRepository.findByShopIdAndEntryCode(shopId, request.entryCode)
+            ?: throw NotFoundException("코드를 찾을 수 없습니다.")
+
+        if (waiting.status != EntryStatus.DEFAULT) {
+            throw InvalidKeyException("올바르지 않은 코드값입니다.")
+        }
+
+              // json 화
         val message = Gson().toJson(entryRequest)
         sqsUtil.sendMessage(message)
     }
@@ -76,6 +83,28 @@ class WaitingService(
             phoneNumber = validatePhoneNumber(request.get("phoneNumber").asString),
             password = request.get("password").asString,
             headCount = request.get("headCount").asInt,
+        )
+
+        return waitingRepository.save(waiting).orderNo
+    }
+
+    @SqsListener("DLQ")
+    fun addEntryDLQ(message: String): Int {
+        val request = JsonParser.parseString(message).asJsonObject
+        val shopId = request.get("shopId").asInt
+        val entryCode = request.get("entryCode").asString
+        val waiting = waitingRepository.findByShopIdAndEntryCode(shopId, entryCode)
+            ?: throw NotFoundException("코드를 찾을 수 없습니다.")
+
+        if (waiting.status != EntryStatus.DEFAULT) {
+            throw InvalidKeyException("올바르지 않은 코드값입니다.")
+        }
+
+        waiting.update(
+            userId = request.get("userId").asInt,
+            phoneNumber = validatePhoneNumber(request.get("phoneNumber").asString),
+            password = request.get("password").asString,
+            headCount = request.get("headCount").asInt
         )
 
         return waitingRepository.save(waiting).orderNo
